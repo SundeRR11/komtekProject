@@ -2,7 +2,6 @@ package com.example.komtekProject.controller;
 
 import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.service.PatientService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
