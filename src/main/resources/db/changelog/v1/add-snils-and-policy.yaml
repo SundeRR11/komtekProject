@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: Alexsandr
+      changes:
+        - addColumn:
+            tableName: patients
+            columns:
+              - column:
+                  name: snils
+                  type: VARCHAR(14)
+                  constraints:
+                    unique: true
+        - createTable:
+            tableName: insurance_policies
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: patient_id
+                  type: BIGINT
+                  constraints:
+                    unique: true
+                    nullable: false
+                    foreignKeyName: fk_policy_patient
+                    references: patients(id)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: policy_number
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: false
+                    unique: true

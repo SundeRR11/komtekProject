@@ -26,4 +26,11 @@ public class PatientService {
         return insurancePolicyRepository.findByPatientId(patientId);
     }
 
+    public InsurancePolicy addPolicyToPatient(Long patientId, String policyNumber){
+        Patient patient = getPatientById(patientId);
+        InsurancePolicy policy = new InsurancePolicy(patient, policyNumber);
+        patient.setInsurancePolicy(policy);
+        return insurancePolicyRepository.save(policy);
+    }
+
 }
