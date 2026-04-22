@@ -34,4 +34,11 @@ public class Patient {
     @Column(unique = true)
     private String email;
 
+    @Column(name = "snils", unique = true, length = 14)
+    private String snils;
+
+    @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private InsurancePolicy insurancePolicy;
+
+
 }
