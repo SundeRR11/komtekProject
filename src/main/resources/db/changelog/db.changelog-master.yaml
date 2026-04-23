@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/v1/create-patient-table.yaml
   - include:
       file: db/changelog/v1/add-snils-and-policy.yaml
+  - include:
+      file: db/changelog/v1/create-orders-table.yaml
