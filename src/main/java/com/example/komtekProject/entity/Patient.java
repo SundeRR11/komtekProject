@@ -4,6 +4,7 @@ import com.example.komtekProject.enums.Gender;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+
 @Entity
 @Table(name = "patients")
 public class Patient {

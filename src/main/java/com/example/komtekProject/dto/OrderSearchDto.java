@@ -6,7 +6,7 @@ public class OrderSearchDto {
     private String patientFullName;
     private String patientBirthDate;
     private String patientSnils;
-    private String patientPolicyNumber;
+    private String patientEnp;
     private String status;
 
     public Long getId() { return id; }
@@ -21,9 +21,10 @@ public class OrderSearchDto {
     public String getPatientSnils() { return patientSnils; }
     public void setPatientSnils(String patientSnils) { this.patientSnils = patientSnils; }
 
-    public String getPatientPolicyNumber() { return patientPolicyNumber; }
-    public void setPatientPolicyNumber(String patientPolicyNumber) { this.patientPolicyNumber = patientPolicyNumber; }
+    public String getPatientEnp() { return patientEnp; }
+    public void setPatientEnp(String patientEnp) { this.patientEnp = patientEnp; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
 }

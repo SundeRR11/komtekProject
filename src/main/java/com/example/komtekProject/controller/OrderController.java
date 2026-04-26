@@ -25,6 +25,12 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<OrderResponseDto> universalSearch(@PathVariable Long id) {
+        OrderResponseDto order = orderService.getOrderById(id);
+        return ResponseEntity.ok(order);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id) {
         OrderResponseDto order = orderService.getOrderById(id);

@@ -1,10 +1,8 @@
 package com.example.komtekProject.entity;
 
-
 import com.example.komtekProject.enums.OrderStatus;
 import jakarta.persistence.*;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
@@ -19,7 +17,7 @@ public class Order {
     private Patient patient;
 
     @Column(name = "created_date",nullable = false)
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -34,7 +32,7 @@ public class Order {
         this.patient = patient;
         this.status = status;
         this.comment = comment;
-        this.createdDate = LocalDate.now();
+        this.createdDate = LocalDateTime.now();
     }
 
     public Long getId() { return id; }
@@ -43,8 +41,8 @@ public class Order {
     public Patient getPatient() { return patient; }
     public void setPatient(Patient patient) { this.patient = patient; }
 
-    public LocalDate getCreatedDate() { return createdDate; }
-    public void setCreatedDate(LocalDate createdDate) { this.createdDate = createdDate; }
+    public LocalDateTime getCreatedDate() { return createdDate; }
+    public void setCreatedDate(LocalDateTime createdDate) { this.createdDate = createdDate; }
 
     public OrderStatus getStatus() { return status; }
     public void setStatus(OrderStatus status) { this.status = status; }

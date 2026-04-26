@@ -1,9 +1,7 @@
 package com.example.komtekProject.entity;
 
-
 import jakarta.persistence.*;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "insurancePolicy")
@@ -18,7 +16,7 @@ public class InsurancePolicy {
     private Patient patient;
 
     @Column(name = "created_date", nullable = false)
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "policy_number", nullable = false, unique = true, length = 16)
     private String policyNumber;
@@ -28,7 +26,7 @@ public class InsurancePolicy {
     public InsurancePolicy(Patient patient, String policyNumber) {
         this.patient = patient;
         this.policyNumber = policyNumber;
-        this.createdDate = LocalDate.now();
+        this.createdDate = LocalDateTime.now();
     }
 
     public Long getId() { return id; }
@@ -37,8 +35,8 @@ public class InsurancePolicy {
     public Patient getPatient() { return patient; }
     public void setPatient(Patient patient) { this.patient = patient; }
 
-    public LocalDate getCreatedDate() { return createdDate; }
-    public void setCreatedDate(LocalDate createdDate) { this.createdDate = createdDate; }
+    public LocalDateTime getCreatedDate() { return createdDate; }
+    public void setCreatedDate(LocalDateTime createdDate) { this.createdDate = createdDate; }
 
     public String getPolicyNumber() { return policyNumber; }
     public void setPolicyNumber(String policyNumber) { this.policyNumber = policyNumber; }

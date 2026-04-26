@@ -1,8 +1,7 @@
 package com.example.komtekProject.dto;
 
 import com.example.komtekProject.enums.OrderStatus;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class OrderResponseDto {
     private Long id;
@@ -10,13 +9,13 @@ public class OrderResponseDto {
     private String patientFullName;
     private String patientSnils;
     private String patientEnp;
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
     private OrderStatus status;
     private String comment;
 
     public OrderResponseDto(Long id, Long patientId, String patientFullName,
                             String patientSnils, String patientEnp,
-                            LocalDate createdDate, OrderStatus status, String comment) {
+                            LocalDateTime createdDate, OrderStatus status, String comment) {
         this.id = id;
         this.patientId = patientId;
         this.patientFullName = patientFullName;

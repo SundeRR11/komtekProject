@@ -3,6 +3,7 @@ package com.example.komtekProject.service;
 
 import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
+import com.example.komtekProject.dto.OrderSearchDto;
 import com.example.komtekProject.entity.Order;
 import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.enums.OrderStatus;
@@ -63,6 +64,26 @@ public class OrderService {
         List<Order> orders = orderRepository.findByStatus(status);
         return orders.stream().map(this::convertToDto).collect(Collectors.toList());
     }
+
+    public List<OrderResponseDto> universalSearch(OrderSearchDto searchDto) {
+        Long id = searchDto.getId();
+        OrderStatus status = searchDto.getStatus() != null
+                ? OrderStatus.valueOf(searchDto.getStatus().toUpperCase())
+                : null;
+        String snils = searchDto.getPatientSnils();
+        String enp = searchDto.getPatientEnp();
+        String fullName = searchDto.getPatientFullName();
+        LocalDate birthDate = searchDto.getPatientBirthDate() != null
+                ? LocalDate.parse(searchDto.getPatientBirthDate())
+                : null;
+
+        List<Order> orders = orderRepository.universalSearch(id, status, snils, enp, fullName, birthDate);
+
+        return orders.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
 
     private OrderResponseDto convertToDto(Order order) {
         Patient patient = order.getPatient();

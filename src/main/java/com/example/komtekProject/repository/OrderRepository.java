@@ -29,6 +29,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByPatientFullNameAndBirthDate(@Param("fullName") String fullName,
                                                   @Param("birthDate") LocalDate birthDate);
 
-
+    @Query("SELECT o FROM Order o WHERE " +
+            "(:id IS NULL OR o.id = :id) AND " +
+            "(:status IS NULL OR o.status = :status) AND " +
+            "(:snils IS NULL OR o.patient.snils = :snils) AND " +
+            "(:enp IS NULL OR o.patient.insurancePolicy.policyNumber = :enp) AND " +
+            "(:fullName IS NULL OR LOWER(CONCAT(o.patient.lastName, ' ', o.patient.firstName, ' ', " +
+            "COALESCE(o.patient.middleName, ''))) LIKE LOWER(CONCAT('%', :fullName, '%'))) AND " +
+            "(:birthDate IS NULL OR o.patient.birthDate = :birthDate)")
+    List<Order> universalSearch(@Param("id") Long id,
+                                @Param("status") OrderStatus status,
+                                @Param("snils") String snils,
+                                @Param("enp") String enp,
+                                @Param("fullName") String fullName,
+                                @Param("birthDate") LocalDate birthDate);
 
 }
