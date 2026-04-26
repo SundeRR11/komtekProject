@@ -26,4 +26,14 @@ public class OrderResponseDto {
         this.comment = comment;
 
     }
+
+    public Long getId() { return id; }
+    public Long getPatientId() { return patientId; }
+    public String getPatientFullName() { return patientFullName; }
+    public String getPatientSnils() { return patientSnils; }
+    public String getPatientEnp() { return patientEnp; }
+    public LocalDateTime getCreatedDate() { return createdDate; }
+    public OrderStatus getStatus() { return status; }
+    public String getComment() { return comment; }
+
 }

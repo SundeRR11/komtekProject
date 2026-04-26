@@ -7,6 +7,8 @@ import com.example.komtekProject.dto.OrderSearchDto;
 import com.example.komtekProject.entity.Order;
 import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.enums.OrderStatus;
+import com.example.komtekProject.exception.OrderNotFoundException;
+import com.example.komtekProject.exception.PatientNotFoundException;
 import com.example.komtekProject.repository.OrderRepository;
 import com.example.komtekProject.repository.PatientRepository;
 import org.springframework.stereotype.Service;
@@ -27,19 +29,22 @@ public class OrderService {
     }
 
     public OrderResponseDto createOrder(OrderRequestDto request) {
-        Patient patient = patientRepository.findPatientById(request.getPatientId());
+        Patient patient = patientRepository.findById(request.getPatientId())
+                .orElseThrow(() -> new PatientNotFoundException(request.getPatientId()));
         Order order = new Order(patient, OrderStatus.REGISTERED, request.getComment());
         Order savedOrder = orderRepository.save(order);
         return convertToDto(savedOrder);
     }
 
     public OrderResponseDto getOrderById(Long id) {
-        Order order = orderRepository.findById(id).get();
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
         return convertToDto(order);
     }
 
     public OrderResponseDto searchById(Long id) {
-        Order order = orderRepository.findById(id).get();
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
         return convertToDto(order);
     }
 
@@ -73,12 +78,9 @@ public class OrderService {
         String snils = searchDto.getPatientSnils();
         String enp = searchDto.getPatientEnp();
         String fullName = searchDto.getPatientFullName();
-        LocalDate birthDate = searchDto.getPatientBirthDate() != null
-                ? LocalDate.parse(searchDto.getPatientBirthDate())
-                : null;
+        LocalDate birthDate = searchDto.getPatientBirthDate();
 
         List<Order> orders = orderRepository.universalSearch(id, status, snils, enp, fullName, birthDate);
-
         return orders.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());

@@ -3,7 +3,9 @@ package com.example.komtekProject.controller;
 
 import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
+import com.example.komtekProject.dto.OrderSearchDto;
 import com.example.komtekProject.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,15 +22,15 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderRequestDto request) {
+    public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody OrderRequestDto request) {
         OrderResponseDto order = orderService.createOrder(request);
         return ResponseEntity.ok(order);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<OrderResponseDto> universalSearch(@PathVariable Long id) {
-        OrderResponseDto order = orderService.getOrderById(id);
-        return ResponseEntity.ok(order);
+    @PostMapping("/search")
+    public ResponseEntity<List<OrderResponseDto>> searchOrders(@Valid @RequestBody OrderSearchDto searchDto) {
+        List<OrderResponseDto> orders = orderService.universalSearch(searchDto);
+        return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{id}")

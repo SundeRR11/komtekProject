@@ -13,8 +13,6 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    List<Order> findByPatientId(Long Id);
-
     @Query("SELECT u from Order u WHERE u.patient.snils = :snils")
     List<Order> findByPatientSnils(@Param("snils") String snils);
 
