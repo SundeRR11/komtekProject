@@ -80,6 +80,7 @@ mvn spring-boot:run
 |GET|	/api/v1/orders/search/by-snils/{snils}|	Поиск по СНИЛС пациента|
 |GET|	/api/v1/orders/search/by-enp/{enp}|	Поиск по ЕНП пациента|
 |GET|	/api/v1/orders/search/by-status/{status}|	Поиск по статусу|
+| POST | `/api/v1/orders/search` | **Универсальный поиск** (по любым параметрам) |
 
 ## Пациенты (Patients)
 | Метод | Эндпоинт | Описание |
