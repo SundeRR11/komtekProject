@@ -49,4 +49,5 @@ databaseChangeLog:
       author: Alexsandr
       changes:
         - sql:
+            dbms: postgresql
             sql: ALTER TABLE patients ADD CONSTRAINT ck_patient_gender CHECK (gender IN ('MALE', 'FEMALE'))

@@ -1,5 +1,6 @@
 package com.example.komtekProject.controller;
 
+import com.example.komtekProject.dto.InsurancePolicyResponseDto;
 import com.example.komtekProject.entity.InsurancePolicy;
 import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.service.PatientService;
@@ -22,8 +23,8 @@ public class PatientController {
     }
 
     @GetMapping("/{id}/policy")
-    public ResponseEntity<InsurancePolicy> getPolicyByPatient(@PathVariable Long id){
-        InsurancePolicy policy = patientService.getPolicyByPatientId(id);
+    public ResponseEntity<InsurancePolicyResponseDto> getPolicyByPatient(@PathVariable Long id){
+        InsurancePolicyResponseDto policy = patientService.getPolicyByPatientId(id);
         return ResponseEntity.ok(policy);
     }
 

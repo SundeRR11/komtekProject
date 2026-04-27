@@ -1,5 +1,6 @@
 package com.example.komtekProject.service;
 
+import com.example.komtekProject.dto.InsurancePolicyResponseDto;
 import com.example.komtekProject.entity.InsurancePolicy;
 import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.exception.PatientNotFoundException;
@@ -24,9 +25,17 @@ public class PatientService {
                 .orElseThrow(() -> new PatientNotFoundException(id));
     }
 
-    public InsurancePolicy getPolicyByPatientId(Long patientId){
-        return insurancePolicyRepository.findByPatientId(patientId)
-                .orElseThrow(() -> new RuntimeException("Полис не найден"));
+    public InsurancePolicyResponseDto getPolicyByPatientId(Long patientId) {
+        getPatientById(patientId);
+
+        InsurancePolicy policy = insurancePolicyRepository.findByPatientId(patientId)
+                .orElseThrow(() -> new RuntimeException("Полис не найден для пациента ID: " + patientId));
+        return new InsurancePolicyResponseDto(
+                policy.getId(),
+                policy.getPatient().getId(),
+                policy.getCreatedDate(),
+                policy.getPolicyNumber()
+        );
     }
 
     public InsurancePolicy addPolicyToPatient(Long patientId, String policyNumber){

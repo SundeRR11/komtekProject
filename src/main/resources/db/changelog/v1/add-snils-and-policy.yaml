@@ -12,7 +12,7 @@ databaseChangeLog:
                   constraints:
                     unique: true
         - createTable:
-            tableName: insurance_policies
+            tableName: insurance_policy
             columns:
               - column:
                   name: id

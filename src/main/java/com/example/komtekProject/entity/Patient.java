@@ -1,6 +1,7 @@
 package com.example.komtekProject.entity;
 
 import com.example.komtekProject.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -39,6 +40,7 @@ public class Patient {
     private String snils;
 
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private InsurancePolicy insurancePolicy;
 
     public void setId(long id) {

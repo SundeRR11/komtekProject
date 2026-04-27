@@ -1,5 +1,6 @@
 package com.example.komtekProject.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ public class InsurancePolicy {
 
     @OneToOne
     @JoinColumn(name = "patient_id", unique = true)
+    @JsonIgnore
     private Patient patient;
 
     @Column(name = "created_date", nullable = false)
