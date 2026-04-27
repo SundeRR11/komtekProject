@@ -2,6 +2,7 @@ package com.example.komtekProject.service;
 
 import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
+import com.example.komtekProject.dto.OrderSearchDto;
 import com.example.komtekProject.entity.Order;
 import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.enums.OrderStatus;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -92,5 +94,28 @@ class OrderServiceTest {
 
         assertThatThrownBy(() -> orderService.getOrderById(999L))
                 .isInstanceOf(OrderNotFoundException.class);
+    }
+
+    @Test
+    void searchByEnp_ShouldReturnOrders() {
+        when(orderRepository.findByPatientEnp("1234567890123456")).thenReturn(List.of(testOrder));
+
+        List<OrderResponseDto> result = orderService.searchByEnp("1234567890123456");
+
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void universalSearch_ShouldReturnFilteredOrders() {
+        OrderSearchDto searchDto = new OrderSearchDto();
+        searchDto.setPatientSnils("123-456-789 01");
+        searchDto.setStatus("REGISTERED");
+
+        when(orderRepository.universalSearch(any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(testOrder));
+
+        List<OrderResponseDto> result = orderService.universalSearch(searchDto);
+
+        assertThat(result).hasSize(1);
     }
 }

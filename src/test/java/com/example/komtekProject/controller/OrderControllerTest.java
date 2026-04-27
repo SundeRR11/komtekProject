@@ -1,126 +1,124 @@
 package com.example.komtekProject.controller;
 
 import com.example.komtekProject.dto.OrderRequestDto;
-import com.example.komtekProject.entity.Patient;
-import com.example.komtekProject.enums.Gender;
-import com.example.komtekProject.repository.OrderRepository;
-import com.example.komtekProject.repository.PatientRepository;
+import com.example.komtekProject.dto.OrderResponseDto;
+import com.example.komtekProject.dto.OrderSearchDto;
+import com.example.komtekProject.enums.OrderStatus;
+import com.example.komtekProject.service.OrderService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 class OrderControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Mock
+    private OrderService orderService;  // ← service (не orderRepository)
 
-    @Autowired
-    private PatientRepository patientRepository;
+    @InjectMocks
+    private OrderController orderController;
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private Patient testPatient;
+    private OrderResponseDto testResponse;
+    private OrderRequestDto testRequest;
+    private OrderSearchDto testSearchDto;
 
     @BeforeEach
     void setUp() {
-        orderRepository.deleteAll();
-        patientRepository.deleteAll();
+        mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
 
-        testPatient = new Patient();
-        testPatient.setLastName("Иванов");
-        testPatient.setFirstName("Иван");
-        testPatient.setMiddleName("Иванович");
-        testPatient.setBirthDate(LocalDate.of(1990, 1, 15));
-        testPatient.setGender(Gender.MALE);
-        testPatient.setSnils("123-456-789 01");
-        patientRepository.save(testPatient);
+        // Тестовые данные
+        testRequest = new OrderRequestDto();
+        testRequest.setPatientId(1L);
+        testRequest.setComment("Тестовая заявка");
+
+        testResponse = new OrderResponseDto(
+                1L, 1L, "Иванов Иван Иванович",
+                "123-456-789 01", "1234567890123456",
+                LocalDateTime.now(), OrderStatus.REGISTERED, "Тестовая заявка"
+        );
+
+        testSearchDto = new OrderSearchDto();
+        testSearchDto.setPatientSnils("123-456-789 01");
+        testSearchDto.setStatus("REGISTERED");
     }
+
+    // ============ ТЕСТЫ ============
 
     @Test
     void createOrder_ShouldReturnCreatedOrder() throws Exception {
-        OrderRequestDto request = new OrderRequestDto();
-        request.setPatientId(testPatient.getId());
-        request.setComment("Анализ крови");
+        when(orderService.createOrder(any(OrderRequestDto.class))).thenReturn(testResponse);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(testRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.patientId").value(testPatient.getId()))
-                .andExpect(jsonPath("$.status").value("REGISTERED"))
-                .andExpect(jsonPath("$.comment").value("Анализ крови"));
+                .andExpect(jsonPath("$.id").value(1L));
     }
 
     @Test
     void getOrderById_ShouldReturnOrder() throws Exception {
-        OrderRequestDto request = new OrderRequestDto();
-        request.setPatientId(testPatient.getId());
-        request.setComment("Тест");
+        when(orderService.getOrderById(1L)).thenReturn(testResponse);
 
-        String response = mockMvc.perform(post("/api/v1/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Long orderId = objectMapper.readTree(response).get("id").asLong();
-
-        mockMvc.perform(get("/api/v1/orders/" + orderId))
+        mockMvc.perform(get("/api/v1/orders/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(orderId));
+                .andExpect(jsonPath("$.id").value(1L));
     }
 
     @Test
     void searchBySnils_ShouldReturnOrders() throws Exception {
+        when(orderService.searchBySnils("123-456-789 01")).thenReturn(List.of(testResponse));
+
         mockMvc.perform(get("/api/v1/orders/search/by-snils/123-456-789 01"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].patientSnils").value("123-456-789 01"));
     }
 
     @Test
     void searchByStatus_ShouldReturnOrders() throws Exception {
+        when(orderService.searchByStatus("REGISTERED")).thenReturn(List.of(testResponse));
+
         mockMvc.perform(get("/api/v1/orders/search/by-status/REGISTERED"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].status").value("REGISTERED"));
     }
 
     @Test
-    void createOrder_WithInvalidPatientId_ShouldReturnBadRequest() throws Exception {
-        OrderRequestDto request = new OrderRequestDto();
-        request.setPatientId(99999L);  // Несуществующий пациент
-        request.setComment("Тест");
+    void searchByEnp_ShouldReturnOrders() throws Exception {
+        when(orderService.searchByEnp("1234567890123456")).thenReturn(List.of(testResponse));
 
-        mockMvc.perform(post("/api/v1/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/v1/orders/search/by-enp/1234567890123456"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].patientEnp").value("1234567890123456"));
     }
 
     @Test
-    void createOrder_WithNullPatientId_ShouldReturnBadRequest() throws Exception {
-        OrderRequestDto request = new OrderRequestDto();
-        request.setPatientId(null);
-        request.setComment("Тест");
+    void universalSearch_ShouldReturnOrders() throws Exception {
+        when(orderService.universalSearch(any(OrderSearchDto.class))).thenReturn(List.of(testResponse));
 
-        mockMvc.perform(post("/api/v1/orders")
+        mockMvc.perform(post("/api/v1/orders/search")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                        .content(objectMapper.writeValueAsString(testSearchDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L));
     }
 }

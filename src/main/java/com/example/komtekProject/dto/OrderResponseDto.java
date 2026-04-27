@@ -15,13 +15,13 @@ public class OrderResponseDto {
 
     public OrderResponseDto(Long id, Long patientId, String patientFullName,
                             String patientSnils, String patientEnp,
-                            LocalDateTime createdDate, OrderStatus status, String comment) {
+                            LocalDateTime createdAt, OrderStatus status, String comment) {
         this.id = id;
         this.patientId = patientId;
         this.patientFullName = patientFullName;
         this.patientSnils = patientSnils;
         this.patientEnp = patientEnp;
-        this.createdDate = createdDate;
+        this.createdDate = createdAt;
         this.status = status;
         this.comment = comment;
 
