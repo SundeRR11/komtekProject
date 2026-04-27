@@ -73,21 +73,21 @@ mvn spring-boot:run
 ## Заявки (Orders)
 | Метод | Эндпоинт | Описание |
 |------|--------------|------------|
-|POST| /api/v1/orders|	Создание заявки|
-|GET|	/api/v1/orders/{id}|	Получение заявки по ID|
-|GET|	/api/v1/orders/search/by-id/{id}|	Поиск по ID заявки|
-|GET|	/api/v1/orders/search/by-fullname-and-birthdate?fullName=&birthDate=|	Поиск по ФИО+дата рождения|
-|GET|	/api/v1/orders/search/by-snils/{snils}|	Поиск по СНИЛС пациента|
-|GET|	/api/v1/orders/search/by-enp/{enp}|	Поиск по ЕНП пациента|
-|GET|	/api/v1/orders/search/by-status/{status}|	Поиск по статусу|
+|POST| `/api/v1/orders`|	Создание заявки|
+|GET|	`/api/v1/orders/{id}`|	Получение заявки по ID|
+|GET|	`/api/v1/orders/search/by-id/{id}`|	Поиск по ID заявки|
+|GET|	`/api/v1/orders/search/by-fullname-and-birthdate?fullName=&birthDate=`|	Поиск по ФИО+дата рождения|
+|GET|	`/api/v1/orders/search/by-snils/{snils}`|	Поиск по СНИЛС пациента|
+|GET|	`/api/v1/orders/search/by-enp/{enp}`|	Поиск по ЕНП пациента|
+|GET|	`/api/v1/orders/search/by-status/{status}`|	Поиск по статусу|
 | POST | `/api/v1/orders/search` | **Универсальный поиск** (по любым параметрам) |
 
 ## Пациенты (Patients)
 | Метод | Эндпоинт | Описание |
 |------------|--------|------------|
-|GET|	/api/v1/patients/{id}|	Получение пациента по ID|
-|GET|	/api/v1/patients/{id}/policy|	Получение полиса пациента|
-|POST|	/api/v1/patients/{id}/policy?policyNumber=|	Добавление полиса пациенту|
+|GET|	`/api/v1/patients/{id}`|	Получение пациента по ID|
+|GET|	`/api/v1/patients/{id}/policy`|	Получение полиса пациента|
+|POST|	`/api/v1/patients/{id}/policy?policyNumber=`|	Добавление полиса пациенту|
 
 ### Коды ошибок
 Все ошибки возвращаются в едином формате:
@@ -106,21 +106,21 @@ mvn spring-boot:run
 ### Коды ошибок
 |Код|	Описание	|HTTP статус|
 |--------------|------------|--------|
-|PATIENT_NOT_FOUND|	Пациент с указанным ID не найден|	400 Bad Request|
-|ORDER_NOT_FOUND|	Заявка с указанным ID не найдена|	400 Bad Request|
-|VALIDATION_ERROR|	Ошибка валидации входных данных|	400 Bad Request|
-|TYPE_MISMATCH|	Неверный тип параметра запроса|	400 Bad Request|
-|INVALID_JSON|	Неверный формат JSON|	400 Bad Request|
-|DUPLICATE_KEY|	Запись с такими данными уже существует|	409 Conflict|
-|INTERNAL_ERROR|	Внутренняя ошибка сервера|	500 Internal Server Error|
+|`PATIENT_NOT_FOUND`|	Пациент с указанным ID не найден|	400 Bad Request|
+|`ORDER_NOT_FOUND`|	Заявка с указанным ID не найдена|	400 Bad Request|
+|`VALIDATION_ERROR`|	Ошибка валидации входных данных|	400 Bad Request|
+|`TYPE_MISMATCH`|	Неверный тип параметра запроса|	400 Bad Request|
+|`INVALID_JSON`|	Неверный формат JSON|	400 Bad Request|
+|`DUPLICATE_KEY`|	Запись с такими данными уже существует|	409 Conflict|
+|`INTERNAL_ERROR`|	Внутренняя ошибка сервера|	500 Internal Server Error|
 
 ### Статусы заявок
 |Статус	|Описание|
 |--------|----------------|
-|REGISTERED|	Зарегистрирована (начальный статус при создании)|
-|IN_PROGRESS|	В процессе выполнения|
-|COMPLETED|	Завершена|
-|CANCELED|	Отменена|
+|`REGISTERED`|	Зарегистрирована (начальный статус при создании)|
+|`IN_PROGRESS`|	В процессе выполнения|
+|`COMPLETED`|	Завершена|
+|`CANCELED`|	Отменена|
 
 
 
