@@ -45,8 +45,6 @@ class OrderControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
-
-        // Тестовые данные
         testRequest = new OrderRequestDto();
         testRequest.setPatientId(1L);
         testRequest.setComment("Тестовая заявка");
@@ -61,8 +59,6 @@ class OrderControllerTest {
         testSearchDto.setPatientSnils("123-456-789 01");
         testSearchDto.setStatus("REGISTERED");
     }
-
-    // ============ ТЕСТЫ ============
 
     @Test
     void createOrder_ShouldReturnCreatedOrder() throws Exception {

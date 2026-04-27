@@ -45,7 +45,6 @@ class PatientRepositoryTest {
 
     @Test
     void duplicateSnils_ShouldThrowException() {
-        // Создаем второго пациента с таким же СНИЛС
         Patient patient2 = new Patient();
         patient2.setLastName("Петров");
         patient2.setFirstName("Петр");
@@ -53,7 +52,6 @@ class PatientRepositoryTest {
         patient2.setGender(Gender.MALE);
         patient2.setSnils("123-456-789 01");  // ← такой же СНИЛС
 
-        // Должно выбросить исключение
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
             patientRepository.save(patient2);
         });
