@@ -10,6 +10,7 @@ import com.example.komtekProject.exception.OrderNotFoundException;
 import com.example.komtekProject.exception.PatientNotFoundException;
 import com.example.komtekProject.repository.OrderRepository;
 import com.example.komtekProject.repository.PatientRepository;
+import com.example.komtekProject.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceTest {
+class OrderServiceImplTest {
 
     @Mock
     private OrderRepository orderRepository;
@@ -34,7 +35,7 @@ class OrderServiceTest {
     private PatientRepository patientRepository;
 
     @InjectMocks
-    private OrderService orderService;
+    private OrderServiceImpl orderServiceImpl;
 
     private Patient testPatient;
     private Order testOrder;
@@ -61,7 +62,7 @@ class OrderServiceTest {
         when(patientRepository.findById(1L)).thenReturn(Optional.of(testPatient));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
 
-        OrderResponseDto response = orderService.createOrder(request);
+        OrderResponseDto response = orderServiceImpl.createOrder(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getPatientId()).isEqualTo(1L);
@@ -74,7 +75,7 @@ class OrderServiceTest {
 
         when(patientRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.createOrder(request))
+        assertThatThrownBy(() -> orderServiceImpl.createOrder(request))
                 .isInstanceOf(PatientNotFoundException.class);
     }
 
@@ -82,7 +83,7 @@ class OrderServiceTest {
     void getOrderById_ShouldReturnOrder() {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
 
-        OrderResponseDto response = orderService.getOrderById(1L);
+        OrderResponseDto response = orderServiceImpl.getOrderById(1L);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
@@ -92,7 +93,7 @@ class OrderServiceTest {
     void getOrderById_WhenOrderNotFound_ShouldThrowException() {
         when(orderRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.getOrderById(999L))
+        assertThatThrownBy(() -> orderServiceImpl.getOrderById(999L))
                 .isInstanceOf(OrderNotFoundException.class);
     }
 
@@ -100,7 +101,7 @@ class OrderServiceTest {
     void searchByEnp_ShouldReturnOrders() {
         when(orderRepository.findByPatientEnp("1234567890123456")).thenReturn(List.of(testOrder));
 
-        List<OrderResponseDto> result = orderService.searchByEnp("1234567890123456");
+        List<OrderResponseDto> result = orderServiceImpl.searchByEnp("1234567890123456");
 
         assertThat(result).hasSize(1);
     }
@@ -114,7 +115,7 @@ class OrderServiceTest {
         when(orderRepository.universalSearch(any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(testOrder));
 
-        List<OrderResponseDto> result = orderService.universalSearch(searchDto);
+        List<OrderResponseDto> result = orderServiceImpl.universalSearch(searchDto);
 
         assertThat(result).hasSize(1);
     }

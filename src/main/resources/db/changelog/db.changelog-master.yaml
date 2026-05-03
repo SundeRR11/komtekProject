@@ -1,7 +1,7 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/v1/create-patient-table.yaml
+      file: db/changelog/v1/2026_05_03_1700_PATIENT_create-patient-table.yaml
   - include:
-      file: db/changelog/v1/add-snils-and-policy.yaml
+      file: db/changelog/v1/2026_05_03_1710_SNILS_AND_ POLICY_add-snils-and-policy.yaml
   - include:
-      file: db/changelog/v1/create-orders-table.yaml
+      file: db/changelog/v1/2026_05_03_1715_ORDERS_create-orders-table.yaml

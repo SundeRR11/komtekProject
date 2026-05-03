@@ -1,74 +1,59 @@
 package com.example.komtekProject.controller;
 
-
+import java.time.LocalDate;
 import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
 import com.example.komtekProject.dto.OrderSearchDto;
-import com.example.komtekProject.service.OrderService;
+import com.example.komtekProject.service.impl.OrderServiceImpl;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
+@RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderService orderService;
-
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
+    private final OrderServiceImpl orderServiceImpl;
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody OrderRequestDto request) {
-        OrderResponseDto order = orderService.createOrder(request);
+        OrderResponseDto order = orderServiceImpl.createOrder(request);
         return ResponseEntity.ok(order);
-    }
-
-    @PostMapping("/search")
-    public ResponseEntity<List<OrderResponseDto>> searchOrders(@Valid @RequestBody OrderSearchDto searchDto) {
-        List<OrderResponseDto> orders = orderService.universalSearch(searchDto);
-        return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id) {
-        OrderResponseDto order = orderService.getOrderById(id);
+        OrderResponseDto order = orderServiceImpl.getOrderById(id);
         return ResponseEntity.ok(order);
     }
 
-    @GetMapping("/search/by-id/{id}")
-    public ResponseEntity<OrderResponseDto> searchById(@PathVariable Long id) {
-        OrderResponseDto order = orderService.searchById(id);
-        return ResponseEntity.ok(order);
-    }
+    @GetMapping("/search")
+    public ResponseEntity<List<OrderResponseDto>> searchOrders(
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String fullName,
+            @RequestParam(required = false) String birthDate,
+            @RequestParam(required = false) String snils,
+            @RequestParam(required = false) String enp,
+            @RequestParam(required = false) String status) {
 
-    @GetMapping("/search/by-fullname-and-birthdate")
-    public ResponseEntity<List<OrderResponseDto>> searchByFullNameAndBirthDate(
-            @RequestParam String fullName,
-            @RequestParam String birthDate) {
-        List<OrderResponseDto> orders = orderService.searchByFullNameAndBirthDate(fullName, birthDate);
+        OrderSearchDto searchDto = new OrderSearchDto();
+        searchDto.setId(id);
+        searchDto.setPatientFullName(fullName);
+
+        if (birthDate != null && !birthDate.isEmpty()) {
+            searchDto.setPatientBirthDate(LocalDate.parse(birthDate));
+        }
+
+        searchDto.setPatientSnils(snils);
+        searchDto.setPatientEnp(enp);
+        searchDto.setStatus(status);
+
+        List<OrderResponseDto> orders = orderServiceImpl.search(searchDto);
         return ResponseEntity.ok(orders);
     }
 
-    @GetMapping("/search/by-snils/{snils}")
-    public ResponseEntity<List<OrderResponseDto>> searchBySnils(@PathVariable String snils) {
-        List<OrderResponseDto> orders = orderService.searchBySnils(snils);
-        return ResponseEntity.ok(orders);
-    }
-
-    @GetMapping("/search/by-enp/{enp}")
-    public ResponseEntity<List<OrderResponseDto>> searchByEnp(@PathVariable String enp) {
-        List<OrderResponseDto> orders = orderService.searchByEnp(enp);
-        return ResponseEntity.ok(orders);
-    }
-
-    @GetMapping("/search/by-status/{status}")
-    public ResponseEntity<List<OrderResponseDto>> searchByStatus(@PathVariable String status) {
-        List<OrderResponseDto> orders = orderService.searchByStatus(status);
-        return ResponseEntity.ok(orders);
-    }
 
 }

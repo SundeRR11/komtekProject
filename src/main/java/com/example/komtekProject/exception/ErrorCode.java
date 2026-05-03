@@ -1,5 +1,8 @@
 package com.example.komtekProject.exception;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum ErrorCode {
 
     PATIENT_NOT_FOUND("PATIENT_NOT_FOUND", "Пациент не найден"),
@@ -12,11 +15,6 @@ public enum ErrorCode {
 
     private final String code;
     private final String defaultMessage;
-
-    ErrorCode(String code, String defaultMessage) {
-        this.code = code;
-        this.defaultMessage = defaultMessage;
-    }
 
     public String getCode() {
         return code;

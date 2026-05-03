@@ -4,7 +4,7 @@ import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
 import com.example.komtekProject.dto.OrderSearchDto;
 import com.example.komtekProject.enums.OrderStatus;
-import com.example.komtekProject.service.OrderService;
+import com.example.komtekProject.service.impl.OrderServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class OrderControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private OrderService orderService;  // ← service (не orderRepository)
+    private OrderServiceImpl orderServiceImpl;  // ← service (не orderRepository)
 
     @InjectMocks
     private OrderController orderController;
@@ -62,7 +62,7 @@ class OrderControllerTest {
 
     @Test
     void createOrder_ShouldReturnCreatedOrder() throws Exception {
-        when(orderService.createOrder(any(OrderRequestDto.class))).thenReturn(testResponse);
+        when(orderServiceImpl.createOrder(any(OrderRequestDto.class))).thenReturn(testResponse);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +73,7 @@ class OrderControllerTest {
 
     @Test
     void getOrderById_ShouldReturnOrder() throws Exception {
-        when(orderService.getOrderById(1L)).thenReturn(testResponse);
+        when(orderServiceImpl.getOrderById(1L)).thenReturn(testResponse);
 
         mockMvc.perform(get("/api/v1/orders/1"))
                 .andExpect(status().isOk())
@@ -82,7 +82,7 @@ class OrderControllerTest {
 
     @Test
     void searchBySnils_ShouldReturnOrders() throws Exception {
-        when(orderService.searchBySnils("123-456-789 01")).thenReturn(List.of(testResponse));
+        when(orderServiceImpl.searchBySnils("123-456-789 01")).thenReturn(List.of(testResponse));
 
         mockMvc.perform(get("/api/v1/orders/search/by-snils/123-456-789 01"))
                 .andExpect(status().isOk())
@@ -91,7 +91,7 @@ class OrderControllerTest {
 
     @Test
     void searchByStatus_ShouldReturnOrders() throws Exception {
-        when(orderService.searchByStatus("REGISTERED")).thenReturn(List.of(testResponse));
+        when(orderServiceImpl.searchByStatus("REGISTERED")).thenReturn(List.of(testResponse));
 
         mockMvc.perform(get("/api/v1/orders/search/by-status/REGISTERED"))
                 .andExpect(status().isOk())
@@ -100,7 +100,7 @@ class OrderControllerTest {
 
     @Test
     void searchByEnp_ShouldReturnOrders() throws Exception {
-        when(orderService.searchByEnp("1234567890123456")).thenReturn(List.of(testResponse));
+        when(orderServiceImpl.searchByEnp("1234567890123456")).thenReturn(List.of(testResponse));
 
         mockMvc.perform(get("/api/v1/orders/search/by-enp/1234567890123456"))
                 .andExpect(status().isOk())
@@ -109,7 +109,7 @@ class OrderControllerTest {
 
     @Test
     void universalSearch_ShouldReturnOrders() throws Exception {
-        when(orderService.universalSearch(any(OrderSearchDto.class))).thenReturn(List.of(testResponse));
+        when(orderServiceImpl.universalSearch(any(OrderSearchDto.class))).thenReturn(List.of(testResponse));
 
         mockMvc.perform(post("/api/v1/orders/search")
                         .contentType(MediaType.APPLICATION_JSON)

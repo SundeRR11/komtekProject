@@ -2,9 +2,17 @@ package com.example.komtekProject.entity;
 
 import com.example.komtekProject.enums.OrderStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "orders")
 public class Order {
 
@@ -26,28 +34,11 @@ public class Order {
     @Column(length = 500)
     private String comment;
 
-    public Order(){}
-
     public Order(Patient patient, OrderStatus status, String comment) {
         this.patient = patient;
         this.status = status;
         this.comment = comment;
         this.createdDate = LocalDateTime.now();
     }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public Patient getPatient() { return patient; }
-    public void setPatient(Patient patient) { this.patient = patient; }
-
-    public LocalDateTime getCreatedDate() { return createdDate; }
-    public void setCreatedDate(LocalDateTime createdDate) { this.createdDate = createdDate; }
-
-    public OrderStatus getStatus() { return status; }
-    public void setStatus(OrderStatus status) { this.status = status; }
-
-    public String getComment() { return comment; }
-    public void setComment(String comment) { this.comment = comment; }
 
 }

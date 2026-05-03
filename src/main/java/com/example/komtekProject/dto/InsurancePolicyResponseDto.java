@@ -1,34 +1,18 @@
 package com.example.komtekProject.dto;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
+
+@RequiredArgsConstructor
+@Getter
+@Setter
 public class InsurancePolicyResponseDto {
-    private Long id;
-    private Long patientId;
-    private LocalDateTime createdDate;
-    private String policyNumber;
+    private final Long id;
+    private final Long patientId;
+    private final LocalDateTime createdDate;
+    private final String policyNumber;
 
-    public InsurancePolicyResponseDto(Long id, Long patientId, LocalDateTime createdDate, String policyNumber) {
-        this.id = id;
-        this.patientId = patientId;
-        this.createdDate = createdDate;
-        this.policyNumber = policyNumber;
-    }
-
-
-    public String getPolicyNumber() {
-        return policyNumber;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public Long getPatientId() {
-        return patientId;
-    }
-
-    public Long getId() {
-        return id;
-    }
 }

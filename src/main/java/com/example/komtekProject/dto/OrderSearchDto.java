@@ -2,10 +2,15 @@ package com.example.komtekProject.dto;
 
 
 import jakarta.validation.constraints.*;
-
+import lombok.*;
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderSearchDto {
+
     @Positive(message = "ID должен быть положительным числом")
     private Long id;
 
@@ -24,23 +29,5 @@ public class OrderSearchDto {
     @Pattern(regexp = "^(REGISTERED|IN_PROGRESS|COMPLETED|CANCELED)$",
             message = "Статус должен быть: REGISTERED, IN_PROGRESS, COMPLETED, CANCELED")
     private String status;
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getPatientFullName() { return patientFullName; }
-    public void setPatientFullName(String patientFullName) { this.patientFullName = patientFullName; }
-
-    public LocalDate getPatientBirthDate() { return patientBirthDate; }
-    public void setPatientBirthDate(LocalDate patientBirthDate) { this.patientBirthDate = patientBirthDate; }
-
-    public String getPatientSnils() { return patientSnils; }
-    public void setPatientSnils(String patientSnils) { this.patientSnils = patientSnils; }
-
-    public String getPatientEnp() { return patientEnp; }
-    public void setPatientEnp(String patientEnp) { this.patientEnp = patientEnp; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
 
 }

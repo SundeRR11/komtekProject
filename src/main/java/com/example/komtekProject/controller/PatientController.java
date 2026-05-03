@@ -1,37 +1,21 @@
 package com.example.komtekProject.controller;
 
-import com.example.komtekProject.dto.InsurancePolicyResponseDto;
-import com.example.komtekProject.entity.InsurancePolicy;
-import com.example.komtekProject.entity.Patient;
-import com.example.komtekProject.service.PatientService;
+import com.example.komtekProject.dto.PatientResponseDto;
+import com.example.komtekProject.service.impl.PatientServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/patients")
+@RequiredArgsConstructor
 public class PatientController {
 
-    private PatientService patientService;
-
-    public PatientController(PatientService patientService){
-        this.patientService = patientService;
-    }
+    private final PatientServiceImpl patientServiceImpl;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
-        return ResponseEntity.ok(patientService.getPatientById(id));
+    public ResponseEntity<PatientResponseDto> getPatientById(@PathVariable Long id) {
+        return ResponseEntity.ok(patientServiceImpl.getPatientById(id));
     }
 
-    @GetMapping("/{id}/policy")
-    public ResponseEntity<InsurancePolicyResponseDto> getPolicyByPatient(@PathVariable Long id){
-        InsurancePolicyResponseDto policy = patientService.getPolicyByPatientId(id);
-        return ResponseEntity.ok(policy);
-    }
-
-    @PostMapping("/{id}/policy")
-    public ResponseEntity<InsurancePolicy> addPolicyToPatient(@PathVariable Long id,
-                                                              @RequestParam String policyNumber){
-        InsurancePolicy policy = patientService.addPolicyToPatient(id, policyNumber);
-        return ResponseEntity.ok(policy);
-    }
 }

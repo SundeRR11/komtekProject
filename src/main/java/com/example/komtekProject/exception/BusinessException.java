@@ -1,5 +1,6 @@
 package com.example.komtekProject.exception;
 
+
 public class BusinessException extends RuntimeException {
     private final ErrorCode errorCode;
 
