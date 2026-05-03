@@ -1,5 +1,6 @@
 package com.example.komtekProject.exception;
 
+import com.example.komtekProject.dto.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,45 +13,50 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-        ErrorResponse error = new ErrorResponse();
-        ex.getBindingResult().getFieldErrors().forEach(fieldError ->
-                error.addError(ErrorCode.VALIDATION_ERROR.getCode(), fieldError.getDefaultMessage())
-        );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+
+        ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
+            errorResponse.addError("VALIDATION_ERROR", fieldError.getDefaultMessage());
+        });
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusiness(BusinessException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(ex.getCode(), ex.getMessage()));
-    }
-    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation() {
-        ErrorResponse errorResponse = new ErrorResponse(
-                ErrorCode.DUPLICATE_KEY.getCode(),
-                "Запись с такими данными уже существует"
-        );
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    public ResponseEntity<ErrorResponseDto> handleBusinessException(BusinessException ex) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ex.getCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<ErrorResponseDto> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         String message = String.format("Параметр '%s' должен быть типа %s",
                 ex.getName(), ex.getRequiredType().getSimpleName());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(ErrorCode.TYPE_MISMATCH.getCode(), message));
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError("TYPE_MISMATCH", message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleNotReadable() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(ErrorCode.INVALID_JSON.getCode(), "Неверный формат JSON"));
+    public ResponseEntity<ErrorResponseDto> handleNotReadable(HttpMessageNotReadableException ex) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError("INVALID_JSON", "Неверный формат JSON");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handleDataIntegrityViolation() {
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError("DUPLICATE_KEY", "Запись с такими данными уже существует");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric() {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(ErrorCode.INTERNAL_ERROR.getCode(), "Внутренняя ошибка сервера"));
+    public ResponseEntity<ErrorResponseDto> handleGenericException(Exception ex) {
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError("INTERNAL_ERROR", "Внутренняя ошибка сервера");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

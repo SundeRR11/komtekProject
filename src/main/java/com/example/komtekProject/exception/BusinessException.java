@@ -1,24 +1,14 @@
 package com.example.komtekProject.exception;
 
 
+import lombok.Getter;
+
+@Getter
 public class BusinessException extends RuntimeException {
-    private final ErrorCode errorCode;
+    private final String code;
 
-    public BusinessException(ErrorCode errorCode) {
-        super(errorCode.getDefaultMessage());
-        this.errorCode = errorCode;
-    }
-
-    public BusinessException(ErrorCode errorCode, String message) {
+    public BusinessException(String code, String message) {
         super(message);
-        this.errorCode = errorCode;
-    }
-
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
-
-    public String getCode() {
-        return errorCode.getCode();
+        this.code = code;
     }
 }
