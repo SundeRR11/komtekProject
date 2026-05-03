@@ -7,8 +7,10 @@ spring:
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
-jackson:
-  default-property-inclusion: non_null
+
+  jackson:
+    default-property-inclusion: non_null
+
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
