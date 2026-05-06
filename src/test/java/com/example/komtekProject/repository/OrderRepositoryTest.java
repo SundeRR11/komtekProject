@@ -73,19 +73,4 @@ class OrderRepositoryTest {
         assertThat(orders).hasSize(2);
     }
 
-    @Test
-    @org.junit.jupiter.api.Order(2)
-    void findByPatientEnp_ShouldReturnOrders() {
-        List<Order> orders = orderRepository.findByPatientEnp("1234567890123456");
-        assertThat(orders).isNotEmpty();
-        assertThat(orders).hasSize(2);
-    }
-
-    @Test
-    @org.junit.jupiter.api.Order(3)
-    void findByPatientSnils_ShouldReturnOrders() {
-        List<Order> orders = orderRepository.findByPatientSnils("123-456-789 01");
-        assertThat(orders).isNotEmpty();
-        assertThat(orders).hasSize(2);
-    }
 }

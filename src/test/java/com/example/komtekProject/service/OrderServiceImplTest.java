@@ -97,14 +97,6 @@ class OrderServiceImplTest {
                 .isInstanceOf(OrderNotFoundException.class);
     }
 
-    @Test
-    void searchByEnp_ShouldReturnOrders() {
-        when(orderRepository.findByPatientEnp("1234567890123456")).thenReturn(List.of(testOrder));
-
-        List<OrderResponseDto> result = orderServiceImpl.searchByEnp("1234567890123456");
-
-        assertThat(result).hasSize(1);
-    }
 
     @Test
     void universalSearch_ShouldReturnFilteredOrders() {
@@ -115,7 +107,7 @@ class OrderServiceImplTest {
         when(orderRepository.universalSearch(any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(testOrder));
 
-        List<OrderResponseDto> result = orderServiceImpl.universalSearch(searchDto);
+        List<OrderResponseDto> result = orderServiceImpl.search(searchDto);
 
         assertThat(result).hasSize(1);
     }

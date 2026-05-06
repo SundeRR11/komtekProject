@@ -64,19 +64,4 @@ class PatientServiceImplTest {
                 .hasMessageContaining("Пациент с ID 999 не найден");
     }
 
-//    @Test
-//    void addPolicyToPatient_ShouldSaveAndReturnPolicy() {
-//        String policyNumber = "1234567890123456";
-//        InsurancePolicy policy = new InsurancePolicy(testPatient, policyNumber);
-//        policy.setId(1L);
-//
-//        when(patientRepository.findById(1L)).thenReturn(Optional.of(testPatient));
-//        when(insurancePolicyRepository.save(any(InsurancePolicy.class))).thenReturn(policy);
-//
-//        InsurancePolicy result = patientService.addPolicyToPatient(1L, policyNumber);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result.getPolicyNumber()).isEqualTo(policyNumber);
-//        verify(insurancePolicyRepository, times(1)).save(any(InsurancePolicy.class));
-//    }
 }

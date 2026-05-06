@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class OrderResponseDto {
     private Long id;
     private Long patientId;
@@ -19,4 +18,16 @@ public class OrderResponseDto {
     private OrderStatus status;
     private String comment;
 
+    public OrderResponseDto(Long id, Long patientId, String patientFullName,
+                            String patientSnils, String patientEnp,
+                            LocalDateTime createdDate, OrderStatus status, String comment) {
+        this.id = id;
+        this.patientId = patientId;
+        this.patientFullName = patientFullName;
+        this.patientSnils = patientSnils;
+        this.patientEnp = patientEnp;
+        this.createdDate = createdDate;
+        this.status = status;
+        this.comment = comment;
+}
 }

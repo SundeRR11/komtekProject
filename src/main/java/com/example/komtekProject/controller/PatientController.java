@@ -4,6 +4,7 @@ import com.example.komtekProject.dto.PatientResponseDto;
 import com.example.komtekProject.service.impl.PatientServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,6 +15,7 @@ public class PatientController {
     private final PatientServiceImpl patientServiceImpl;
 
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public ResponseEntity<PatientResponseDto> getPatientById(@PathVariable Long id) {
         return ResponseEntity.ok(patientServiceImpl.getPatientById(id));
     }

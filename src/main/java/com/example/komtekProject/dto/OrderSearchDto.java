@@ -1,6 +1,9 @@
 package com.example.komtekProject.dto;
 
 
+import com.example.komtekProject.annotation.ValidDate;
+import com.example.komtekProject.annotation.ValidEnp;
+import com.example.komtekProject.annotation.ValidSnils;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -9,6 +12,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class OrderSearchDto {
 
     @Positive(message = "ID должен быть положительным числом")
@@ -17,13 +21,13 @@ public class OrderSearchDto {
     @Size(max = 200, message = "ФИО не может превышать 200 символов")
     private String patientFullName;
 
-    @Past(message = "Дата рождения должна быть в прошлом")
+    @ValidDate
     private LocalDate patientBirthDate;
 
-    @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{3} \\d{2}$", message = "СНИЛС должен быть в формате 123-456-789 01")
+    @ValidSnils
     private String patientSnils;
 
-    @Pattern(regexp = "^\\d{16}$", message = "ЕНП должен состоять из 16 цифр")
+    @ValidEnp
     private String patientEnp;
 
     @Pattern(regexp = "^(REGISTERED|IN_PROGRESS|COMPLETED|CANCELED)$",
