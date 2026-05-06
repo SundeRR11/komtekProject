@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PatientController {
 
-    private final PatientServiceImpl patientServiceImpl;
+    private final PatientServiceImpl patientService;
 
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<PatientResponseDto> getPatientById(@PathVariable Long id) {
-        return ResponseEntity.ok(patientServiceImpl.getPatientById(id));
+        return ResponseEntity.ok(patientService.getPatientById(id));
     }
 
 }

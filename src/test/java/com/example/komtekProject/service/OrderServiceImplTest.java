@@ -8,6 +8,7 @@ import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.enums.OrderStatus;
 import com.example.komtekProject.exception.OrderNotFoundException;
 import com.example.komtekProject.exception.PatientNotFoundException;
+import com.example.komtekProject.mapper.OrderMapper;
 import com.example.komtekProject.repository.OrderRepository;
 import com.example.komtekProject.repository.PatientRepository;
 import com.example.komtekProject.service.impl.OrderServiceImpl;
@@ -17,13 +18,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
@@ -34,11 +38,15 @@ class OrderServiceImplTest {
     @Mock
     private PatientRepository patientRepository;
 
+    @Mock  // ← ДОБАВЬ ЭТО!
+    private OrderMapper orderMapper;
+
     @InjectMocks
-    private OrderServiceImpl orderServiceImpl;
+    private OrderServiceImpl orderService;
 
     private Patient testPatient;
     private Order testOrder;
+    private OrderResponseDto testResponseDto;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +59,12 @@ class OrderServiceImplTest {
         testOrder = new Order(testPatient, OrderStatus.REGISTERED, "Тест");
         testOrder.setId(1L);
         testOrder.setCreatedDate(LocalDateTime.now());
+
+        testResponseDto = new OrderResponseDto(
+                1L, 1L, "Иванов Иван Иванович",
+                "123-456-789 01", "1234567890123456",
+                LocalDateTime.now(), OrderStatus.REGISTERED, "Тест"
+        );
     }
 
     @Test
@@ -61,11 +75,12 @@ class OrderServiceImplTest {
 
         when(patientRepository.findById(1L)).thenReturn(Optional.of(testPatient));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+        when(orderMapper.toDto(testOrder)).thenReturn(testResponseDto);  // ← ДОБАВЬ
 
-        OrderResponseDto response = orderServiceImpl.createOrder(request);
+        OrderResponseDto response = orderService.createOrder(request);
 
         assertThat(response).isNotNull();
-        assertThat(response.getPatientId()).isEqualTo(1L);
+        assertThat(response.getId()).isEqualTo(1L);
     }
 
     @Test
@@ -75,15 +90,16 @@ class OrderServiceImplTest {
 
         when(patientRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderServiceImpl.createOrder(request))
+        assertThatThrownBy(() -> orderService.createOrder(request))
                 .isInstanceOf(PatientNotFoundException.class);
     }
 
     @Test
     void getOrderById_ShouldReturnOrder() {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
+        when(orderMapper.toDto(testOrder)).thenReturn(testResponseDto);  // ← ДОБАВЬ
 
-        OrderResponseDto response = orderServiceImpl.getOrderById(1L);
+        OrderResponseDto response = orderService.getOrderById(1L);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo(1L);
@@ -93,10 +109,9 @@ class OrderServiceImplTest {
     void getOrderById_WhenOrderNotFound_ShouldThrowException() {
         when(orderRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderServiceImpl.getOrderById(999L))
+        assertThatThrownBy(() -> orderService.getOrderById(999L))
                 .isInstanceOf(OrderNotFoundException.class);
     }
-
 
     @Test
     void universalSearch_ShouldReturnFilteredOrders() {
@@ -106,9 +121,11 @@ class OrderServiceImplTest {
 
         when(orderRepository.universalSearch(any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(testOrder));
+        when(orderMapper.toDtoList(List.of(testOrder))).thenReturn(List.of(testResponseDto));  // ← ДОБАВЬ
 
-        List<OrderResponseDto> result = orderServiceImpl.search(searchDto);
+        List<OrderResponseDto> result = orderService.search(searchDto);
 
         assertThat(result).hasSize(1);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
     }
 }

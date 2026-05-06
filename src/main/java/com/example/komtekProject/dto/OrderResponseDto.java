@@ -4,7 +4,6 @@ import com.example.komtekProject.enums.OrderStatus;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@RequiredArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor

@@ -23,24 +23,24 @@ import java.util.List;
 @Validated
 public class OrderController {
 
-    private final OrderServiceImpl orderServiceImpl;
+    private final OrderServiceImpl orderService;
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody OrderRequestDto request) {
-        OrderResponseDto order = orderServiceImpl.createOrder(request);
+        OrderResponseDto order = orderService.createOrder(request);
         return ResponseEntity.ok(order);
     }
 
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id) {
-        OrderResponseDto order = orderServiceImpl.getOrderById(id);
+        OrderResponseDto order = orderService.getOrderById(id);
         return ResponseEntity.ok(order);
     }
 
     @GetMapping("/search")
     @Transactional(readOnly = true)
     public ResponseEntity<List<OrderResponseDto>> searchOrders(@Valid @ModelAttribute OrderSearchDto searchDto) {
-        return ResponseEntity.ok(orderServiceImpl.search(searchDto));
+        return ResponseEntity.ok(orderService.search(searchDto));
     }
 }
