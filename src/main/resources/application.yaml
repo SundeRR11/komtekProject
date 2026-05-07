@@ -14,3 +14,15 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
+logging:
+    level:
+      com.example.komtekProject: DEBUG
+      org.springframework: WARN
+      org.hibernate: WARN
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+    file:
+      name: logs/komtek-app.log
+      max-size: 10MB
+      max-history: 30
+

@@ -25,4 +25,11 @@ public class PatientResponseDto {
     @ValidSnils
     private String snils;
 
+    public String getFullName() {
+        return String.format("%s %s %s",
+                lastName != null ? lastName : "",
+                firstName != null ? firstName : "",
+                middleName != null ? middleName : "").trim();
+    }
+
 }

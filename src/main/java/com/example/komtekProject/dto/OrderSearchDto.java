@@ -34,4 +34,12 @@ public class OrderSearchDto {
             message = "Статус должен быть: REGISTERED, IN_PROGRESS, COMPLETED, CANCELED")
     private String status;
 
+    @Min(value = 0, message = "Номер страницы не может быть отрицательным")
+    private Integer page = 0;
+
+    @Min(value = 1, message = "Размер страницы должен быть не менее 1")
+    private Integer size = 10;
+
+    private String sortBy = "createdDate";
+    private String sortDir = "desc";
 }
