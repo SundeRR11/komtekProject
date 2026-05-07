@@ -30,7 +30,7 @@
 		<java.version>26</java.version>
 		<org.mapstruct.version>1.6.3</org.mapstruct.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 	<dependencies>
 		<dependency>

@@ -26,6 +26,8 @@ spring:
           default_schema: medical
 
 logging:
+  charset:
+    console: UTF-8
     level:
       com.example.komtekProject: DEBUG
       com.example.komtekProject.aspect: DEBUG
