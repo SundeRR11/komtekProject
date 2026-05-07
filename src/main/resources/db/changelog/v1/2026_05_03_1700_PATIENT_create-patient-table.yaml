@@ -5,6 +5,7 @@ databaseChangeLog:
       changes:
         - createTable:
             tableName: patients
+            schemaName: medical
             columns:
               - column:
                   name: id

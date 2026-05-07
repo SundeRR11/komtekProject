@@ -7,11 +7,11 @@ import com.example.komtekProject.service.impl.OrderServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -40,10 +40,10 @@ public class OrderController {
 
     @GetMapping("/search")
     @Transactional(readOnly = true)
-    public ResponseEntity<List<OrderResponseDto>> searchOrders(@Valid @ModelAttribute OrderSearchDto searchDto) {
+    public ResponseEntity<Page<OrderResponseDto>> searchOrders(@Valid @ModelAttribute OrderSearchDto searchDto) {
         log.info("Поиск заявок с параметрами: {}", searchDto);
-        List<OrderResponseDto> orders = orderService.search(searchDto);
-        log.info("Найдено заявок: {}", orders.size());
+        Page<OrderResponseDto> orders = orderService.search(searchDto);
+        log.info("Найдено заявок: всего={}, страниц={}", orders.getTotalElements(), orders.getTotalPages());
         return ResponseEntity.ok(orders);
     }
 }

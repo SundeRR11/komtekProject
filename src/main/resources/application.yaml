@@ -14,9 +14,15 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: medical
+  jpa:
+    properties:
+      hibernate:
+          efault_schema: medical
 logging:
     level:
       com.example.komtekProject: DEBUG
+      com.example.komtekProject.aspect: DEBUG
       org.springframework: WARN
       org.hibernate: WARN
     pattern:
