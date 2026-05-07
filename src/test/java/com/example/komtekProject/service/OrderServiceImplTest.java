@@ -18,8 +18,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +41,7 @@ class OrderServiceImplTest {
     @Mock
     private PatientRepository patientRepository;
 
-    @Mock  // ← ДОБАВЬ ЭТО!
+    @Mock
     private OrderMapper orderMapper;
 
     @InjectMocks
@@ -75,7 +78,7 @@ class OrderServiceImplTest {
 
         when(patientRepository.findById(1L)).thenReturn(Optional.of(testPatient));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-        when(orderMapper.toDto(testOrder)).thenReturn(testResponseDto);  // ← ДОБАВЬ
+        when(orderMapper.toDto(testOrder)).thenReturn(testResponseDto);
 
         OrderResponseDto response = orderService.createOrder(request);
 
@@ -97,7 +100,7 @@ class OrderServiceImplTest {
     @Test
     void getOrderById_ShouldReturnOrder() {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
-        when(orderMapper.toDto(testOrder)).thenReturn(testResponseDto);  // ← ДОБАВЬ
+        when(orderMapper.toDto(testOrder)).thenReturn(testResponseDto);
 
         OrderResponseDto response = orderService.getOrderById(1L);
 
@@ -114,18 +117,24 @@ class OrderServiceImplTest {
     }
 
     @Test
-    void universalSearch_ShouldReturnFilteredOrders() {
+    void search_ShouldReturnPageOfOrders() {
         OrderSearchDto searchDto = new OrderSearchDto();
         searchDto.setPatientSnils("123-456-789 01");
         searchDto.setStatus("REGISTERED");
+        searchDto.setPage(0);
+        searchDto.setSize(10);
 
-        when(orderRepository.universalSearch(any(), any(), any(), any(), any(), any()))
-                .thenReturn(List.of(testOrder));
-        when(orderMapper.toDtoList(List.of(testOrder))).thenReturn(List.of(testResponseDto));  // ← ДОБАВЬ
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Order> orderPage = new PageImpl<>(List.of(testOrder), pageable, 1);
 
-        List<OrderResponseDto> result = orderService.search(searchDto);
+        when(orderRepository.search(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(orderPage);
+        when(orderMapper.toDto(testOrder)).thenReturn(testResponseDto);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getId()).isEqualTo(1L);
+        Page<OrderResponseDto> result = orderService.search(searchDto);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).getId()).isEqualTo(1L);
     }
 }

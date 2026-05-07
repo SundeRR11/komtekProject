@@ -3,13 +3,12 @@ package com.example.komtekProject.controller;
 import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
 import com.example.komtekProject.dto.OrderSearchDto;
-import com.example.komtekProject.service.impl.OrderServiceImpl;
+import com.example.komtekProject.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class OrderController {
 
-    private final OrderServiceImpl orderService;
+    private final OrderService orderService;
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody OrderRequestDto request) {
@@ -31,7 +30,6 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable Long id) {
         log.info("Получение заявки по ID: {}", id);
         OrderResponseDto order = orderService.getOrderById(id);
@@ -39,7 +37,6 @@ public class OrderController {
     }
 
     @GetMapping("/search")
-    @Transactional(readOnly = true)
     public ResponseEntity<Page<OrderResponseDto>> searchOrders(@Valid @ModelAttribute OrderSearchDto searchDto) {
         log.info("Поиск заявок с параметрами: {}", searchDto);
         Page<OrderResponseDto> orders = orderService.search(searchDto);

@@ -1,11 +1,10 @@
 package com.example.komtekProject.controller;
 
 import com.example.komtekProject.dto.PatientResponseDto;
-import com.example.komtekProject.service.impl.PatientServiceImpl;
+import com.example.komtekProject.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -14,10 +13,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PatientController {
 
-    private final PatientServiceImpl patientService;
+    private final PatientService patientService;
 
     @GetMapping("/{id}")
-    @Transactional(readOnly = true)
     public ResponseEntity<PatientResponseDto> getPatientById(@PathVariable Long id) {
         log.info("Получение пациента по ID: {}", id);
         PatientResponseDto patient = patientService.getPatientById(id);

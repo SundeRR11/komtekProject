@@ -5,11 +5,13 @@ import com.example.komtekProject.annotation.ValidSnils;
 import com.example.komtekProject.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class PatientResponseDto {
     private Long id;

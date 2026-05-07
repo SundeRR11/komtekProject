@@ -8,6 +8,11 @@ spring:
     password: password
     driver-class-name: org.postgresql.Driver
 
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:init.sql
+
   jackson:
     default-property-inclusion: non_null
 
@@ -18,7 +23,8 @@ spring:
   jpa:
     properties:
       hibernate:
-          efault_schema: medical
+          default_schema: medical
+
 logging:
     level:
       com.example.komtekProject: DEBUG

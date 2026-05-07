@@ -12,15 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggingAspect {
 
-    @Pointcut("within(com.example.komtekProject.controller..*)")
-    public void controllerMethods() {}
-
     @Pointcut("within(com.example.komtekProject.service..*)")
     public void serviceMethods() {}
 
-    @Around("controllerMethods() || serviceMethods()")
+    @Around("serviceMethods()")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        System.out.println("!!! ASPECT WORKS !!!");
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
 
@@ -28,15 +24,14 @@ public class LoggingAspect {
 
         try {
             Object result = joinPoint.proceed();
-
             long duration = System.currentTimeMillis() - startTime;
-                log.info("{}.{}() - executed in {} ms", className, methodName, duration);
+
+            log.info("{}.{} - executed in {} ms", className, methodName, duration);
 
             return result;
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startTime;
-
-            log.error("{}.{}() - error in {} ms: {}", className, methodName, duration, e.getMessage());
+            log.error("{}.{} - error in {} ms", className, methodName, duration, e);
             throw e;
         }
     }
