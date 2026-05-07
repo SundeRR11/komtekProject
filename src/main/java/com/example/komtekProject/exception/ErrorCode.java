@@ -12,7 +12,8 @@ public enum ErrorCode {
     TYPE_MISMATCH("TYPE_MISMATCH", "Неверный тип параметра"),
     INVALID_JSON("INVALID_JSON", "Неверный формат JSON"),
     DUPLICATE_KEY("DUPLICATE_KEY", "Запись с такими данными уже существует"),
-    INTERNAL_ERROR("INTERNAL_ERROR", "Внутренняя ошибка сервера");
+    INTERNAL_ERROR("INTERNAL_ERROR", "Внутренняя ошибка сервера"),
+    INVALID_UPDATE("INVALID_UPDATE", "Неверный запрос на обновление");
 
     private final String code;
     private final String defaultMessage;

@@ -3,9 +3,11 @@ package com.example.komtekProject.service.impl;
 import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
 import com.example.komtekProject.dto.OrderSearchDto;
+import com.example.komtekProject.dto.OrderUpdateDto;
 import com.example.komtekProject.entity.Order;
 import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.enums.OrderStatus;
+import com.example.komtekProject.exception.InvalidOrderUpdateException;
 import com.example.komtekProject.exception.OrderNotFoundException;
 import com.example.komtekProject.exception.PatientNotFoundException;
 import com.example.komtekProject.mapper.OrderMapper;
@@ -92,7 +94,64 @@ public class OrderServiceImpl implements OrderService {
         log.debug("Найдено заявок: всего={}, страниц={}", orderPage.getTotalElements(), orderPage.getTotalPages());
         return orderPage.map(orderMapper::toDto);
     }
+
+    @Override
+    @Transactional
+    public OrderResponseDto updateOrder(OrderUpdateDto updateDto) {
+        log.info("PATCH обновление заявки ID: {}", updateDto.getId());
+        Order order = orderRepository.findById(updateDto.getId())
+                .orElseThrow(() -> {
+                    log.warn("Заявка с ID {} не найдена для обновления", updateDto.getId());
+                    return new OrderNotFoundException(updateDto.getId());
+                });
+
+        OrderStatus oldStatus = order.getStatus();
+        String oldComment = order.getComment();
+        boolean hasChanges = false;
+
+        if (updateDto.getStatus() != null) {
+            log.info("  Обновление статуса: {} -> {}", oldStatus, updateDto.getStatus());
+            order.setStatus(updateDto.getStatus());
+            hasChanges = true;
+        }
+
+        if (updateDto.getComment() != null) {
+            log.info("  Обновление комментария: '{}' -> '{}'", oldComment, updateDto.getComment());
+            order.setComment(updateDto.getComment());
+            hasChanges = true;
+        }
+
+        if (!hasChanges) {
+            log.warn("PATCH запрос для заявки ID: {} не содержит полей для обновления", updateDto.getId());
+            throw new InvalidOrderUpdateException("Не указаны поля для обновления (status или comment)");
+        }
+
+        Order updatedOrder = orderRepository.save(order);
+        log.info("Заявка ID: {} успешно обновлена", updatedOrder.getId());
+
+        return orderMapper.toDto(updatedOrder);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrder(Long id) {
+        log.info("Удаление заявки ID: {}", id);
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Заявка с ID {} не найдена для удаления", id);
+                    return new OrderNotFoundException(id);
+                });
+
+        Long orderId = order.getId();
+        OrderStatus status = order.getStatus();
+        Long patientId = order.getPatient().getId();
+
+        orderRepository.delete(order);
+
+        log.info("Заявка ID: {} удалена. Статус: {}, Пациент ID: {}", orderId, status, patientId);
+    }
 }
+
 
 
 

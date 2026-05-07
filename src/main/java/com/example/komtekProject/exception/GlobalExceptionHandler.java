@@ -73,4 +73,13 @@ public class GlobalExceptionHandler {
         errorResponse.addError("INTERNAL_ERROR", "Внутренняя ошибка сервера");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+    @ExceptionHandler(InvalidOrderUpdateException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidUpdate(InvalidOrderUpdateException ex) {
+        log.error("Ошибка обновления заявки: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ErrorCode.INVALID_UPDATE.getCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
 }

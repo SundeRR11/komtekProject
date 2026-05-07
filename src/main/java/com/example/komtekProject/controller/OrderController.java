@@ -3,6 +3,7 @@ package com.example.komtekProject.controller;
 import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
 import com.example.komtekProject.dto.OrderSearchDto;
+import com.example.komtekProject.dto.OrderUpdateDto;
 import com.example.komtekProject.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,4 +44,33 @@ public class OrderController {
         log.info("Найдено заявок: всего={}, страниц={}", orders.getTotalElements(), orders.getTotalPages());
         return ResponseEntity.ok(orders);
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<OrderResponseDto> updateOrder(
+            @PathVariable Long id,
+            @Valid @RequestBody OrderUpdateDto updateDto) {
+
+        log.info("PATCH запрос на обновление заявки ID: {}", id);
+
+        if (updateDto.getId() == null) {
+            updateDto.setId(id);
+        } else if (!id.equals(updateDto.getId())) {
+            log.warn("ID в пути ({}) не совпадает с ID в теле запроса ({})", id, updateDto.getId());
+            throw new IllegalArgumentException("ID в пути не совпадает с ID в теле запроса");
+        }
+
+        OrderResponseDto updatedOrder = orderService.updateOrder(updateDto);
+        log.info("Заявка ID: {} успешно обновлена через PATCH", id);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+        log.info("DELETE запрос на удаление заявки ID: {}", id);
+        orderService.deleteOrder(id);
+        log.info("Заявка ID: {} успешно удалена", id);
+        return ResponseEntity.noContent().build();
+    }
 }
+
+
