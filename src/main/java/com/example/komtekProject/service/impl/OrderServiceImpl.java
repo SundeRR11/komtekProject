@@ -147,7 +147,6 @@ public class OrderServiceImpl implements OrderService {
         Long patientId = order.getPatient().getId();
 
         orderRepository.delete(order);
-
         log.info("Заявка ID: {} удалена. Статус: {}, Пациент ID: {}", orderId, status, patientId);
     }
 }

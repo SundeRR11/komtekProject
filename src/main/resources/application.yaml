@@ -28,14 +28,14 @@ spring:
 logging:
   charset:
     console: UTF-8
-    level:
+  level:
       com.example.komtekProject: DEBUG
       com.example.komtekProject.aspect: DEBUG
       org.springframework: WARN
       org.hibernate: WARN
-    pattern:
+  pattern:
       console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
-    file:
+  file:
       name: logs/komtek-app.log
       max-size: 10MB
       max-history: 30

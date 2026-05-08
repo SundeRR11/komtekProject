@@ -1,4 +1,4 @@
-package com.example.komtekProject.aspect;
+package com.example.komtekProject.AOP;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
