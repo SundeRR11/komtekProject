@@ -13,6 +13,7 @@ databaseChangeLog:
                     unique: true
         - createTable:
             tableName: insurance_policy
+            schemaName: medical
             columns:
               - column:
                   name: id

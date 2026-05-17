@@ -1,5 +1,6 @@
 package com.example.komtekProject.config;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +17,11 @@ import java.sql.Statement;
 @Component
 public class SchemaConfiguration implements BeanPostProcessor {
 
-    @Value("${liquibase.default.db.schema:public}")
+    @Value("${spring.liquibase.default-schema:public}")
     private String schemaName;
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(@NotNull Object bean, @NotNull String beanName) {
         if (StringUtils.hasText(schemaName) && bean instanceof DataSource dataSource) {
             try (Connection conn = dataSource.getConnection();
                  Statement statement = conn.createStatement()) {

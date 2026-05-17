@@ -16,27 +16,27 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        log.error("Ошибка валидации: {}", ex.getMessage());
+    @ExceptionHandler(PatientNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handlePatientNotFound(PatientNotFoundException ex) {
+        log.warn("Пациент не найден: {}", ex.getMessage());
         ErrorResponseDto errorResponse = new ErrorResponseDto();
-
-        ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
-            errorResponse.addError("VALIDATION_ERROR", fieldError.getDefaultMessage());
-        });
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        errorResponse.addError(ex.getCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponseDto> handleConstraintViolation(ConstraintViolationException ex) {
-        log.error("Ошибка валидации параметров: {}", ex.getMessage());
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleOrderNotFound(OrderNotFoundException ex) {
+        log.warn("Заявка не найдена: {}", ex.getMessage());
         ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ex.getCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
 
-        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-            errorResponse.addError("VALIDATION_ERROR", violation.getMessage());
-        }
-
+    @ExceptionHandler(InvalidOrderUpdateException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidUpdate(InvalidOrderUpdateException ex) {
+        log.error("Ошибка обновления заявки: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ex.getCode(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
@@ -48,38 +48,76 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        log.error("Ошибка валидации: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+
+        ex.getBindingResult().getFieldErrors().forEach(fieldError ->
+                errorResponse.addError(
+                        ErrorCode.VALIDATION_ERROR.getCode(),
+                        String.format("Поле '%s': %s", fieldError.getField(),
+                                fieldError.getDefaultMessage())
+                )
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handleConstraintViolation(
+            ConstraintViolationException ex) {
+        log.error("Ошибка валидации параметров: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+
+        ex.getConstraintViolations().forEach(violation ->
+                errorResponse.addError(
+                        ErrorCode.VALIDATION_ERROR.getCode(),
+                        violation.getMessage()
+                )
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponseDto> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<ErrorResponseDto> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex) {
         log.error("Неверный тип параметра: {}", ex.getMessage());
         String message = String.format("Параметр '%s' должен быть типа %s",
-                ex.getName(), ex.getRequiredType().getSimpleName());
+                ex.getName(),
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown");
         ErrorResponseDto errorResponse = new ErrorResponseDto();
-        errorResponse.addError("TYPE_MISMATCH", message);
+        errorResponse.addError(ErrorCode.TYPE_MISMATCH.getCode(), message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponseDto> handleNotReadable(HttpMessageNotReadableException ex) {
+    public ResponseEntity<ErrorResponseDto> handleNotReadable(
+            HttpMessageNotReadableException ex) {
         log.error("Неверный формат JSON: {}", ex.getMessage());
         ErrorResponseDto errorResponse = new ErrorResponseDto();
-        errorResponse.addError("INVALID_JSON", "Неверный формат JSON");
+        errorResponse.addError(ErrorCode.INVALID_JSON.getCode(), "Неверный формат JSON");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDto> handleIllegalArgument(IllegalArgumentException ex) {
+        log.error("Неверный аргумент: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ErrorCode.VALIDATION_ERROR.getCode(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGenericException(Exception ex) {
-        log.error("Внутренняя ошибка сервера: {}", ex.getMessage(), ex);
+        log.error("Внутренняя ошибка сервера", ex);
         ErrorResponseDto errorResponse = new ErrorResponseDto();
-        errorResponse.addError("INTERNAL_ERROR", "Внутренняя ошибка сервера");
+        errorResponse.addError(
+                ErrorCode.INTERNAL_ERROR.getCode(),
+                "Внутренняя ошибка сервера"
+        );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
-
-    @ExceptionHandler(InvalidOrderUpdateException.class)
-    public ResponseEntity<ErrorResponseDto> handleInvalidUpdate(InvalidOrderUpdateException ex) {
-        log.error("Ошибка обновления заявки: {}", ex.getMessage());
-        ErrorResponseDto errorResponse = new ErrorResponseDto();
-        errorResponse.addError(ErrorCode.INVALID_UPDATE.getCode(), ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
 }

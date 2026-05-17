@@ -5,6 +5,7 @@ databaseChangeLog:
       changes:
         - createTable:
             tableName: orders
+            schemaName: medical
             columns:
               - column:
                   name: id
@@ -48,7 +49,7 @@ databaseChangeLog:
 
         - createIndex:
             tableName: orders
-            indexName: idx_orders_created_at
+            indexName: idx_orders_created_date
             columns:
               - column:
                   name: created_date

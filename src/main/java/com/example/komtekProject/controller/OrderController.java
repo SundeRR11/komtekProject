@@ -6,6 +6,7 @@ import com.example.komtekProject.dto.OrderSearchDto;
 import com.example.komtekProject.dto.OrderUpdateDto;
 import com.example.komtekProject.service.OrderService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -47,20 +48,12 @@ public class OrderController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<OrderResponseDto> updateOrder(
-            @PathVariable Long id,
+            @PathVariable @Positive(message = "ID должен быть положительным") Long id,
             @Valid @RequestBody OrderUpdateDto updateDto) {
 
         log.info("PATCH запрос на обновление заявки ID: {}", id);
-
-        if (updateDto.getId() == null) {
-            updateDto.setId(id);
-        } else if (!id.equals(updateDto.getId())) {
-            log.warn("ID в пути ({}) не совпадает с ID в теле запроса ({})", id, updateDto.getId());
-            throw new IllegalArgumentException("ID в пути не совпадает с ID в теле запроса");
-        }
-
-        OrderResponseDto updatedOrder = orderService.updateOrder(updateDto);
-        log.info("Заявка ID: {} успешно обновлена через PATCH", id);
+        OrderResponseDto updatedOrder = orderService.updateOrder(id, updateDto);
+        log.info("Заявка ID: {} успешно обновлена", id);
         return ResponseEntity.ok(updatedOrder);
     }
 

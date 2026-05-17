@@ -1,7 +1,5 @@
 package com.example.komtekProject.dto;
 
-import com.example.komtekProject.annotation.ValidDate;
-import com.example.komtekProject.annotation.ValidSnils;
 import com.example.komtekProject.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,12 +17,10 @@ public class PatientResponseDto {
     private String firstName;
     private String middleName;
 
-    @ValidDate
     private LocalDate birthDate;
 
     private Gender gender;
 
-    @ValidSnils
     private String snils;
 
     public String getFullName() {

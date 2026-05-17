@@ -14,7 +14,6 @@ import com.example.komtekProject.mapper.OrderMapper;
 import com.example.komtekProject.repository.OrderRepository;
 import com.example.komtekProject.repository.PatientRepository;
 import com.example.komtekProject.service.OrderService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -54,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public OrderResponseDto getOrderById(Long id) {
         log.debug("Поиск заявки по ID: {}", id);
 
@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<OrderResponseDto> search(OrderSearchDto searchDto) {
         log.debug("Поиск заявок с параметрами: {}", searchDto);
 
@@ -97,12 +97,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponseDto updateOrder(OrderUpdateDto updateDto) {
-        log.info("PATCH обновление заявки ID: {}", updateDto.getId());
-        Order order = orderRepository.findById(updateDto.getId())
+    public OrderResponseDto updateOrder(Long id, OrderUpdateDto updateDto) {
+        log.info("PATCH обновление заявки ID: {}", id);
+
+        Order order = orderRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("Заявка с ID {} не найдена для обновления", updateDto.getId());
-                    return new OrderNotFoundException(updateDto.getId());
+                    log.warn("Заявка с ID {} не найдена для обновления", id);
+                    return new OrderNotFoundException(id);
                 });
 
         OrderStatus oldStatus = order.getStatus();
@@ -122,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (!hasChanges) {
-            log.warn("PATCH запрос для заявки ID: {} не содержит полей для обновления", updateDto.getId());
+            log.warn("PATCH запрос для заявки ID: {} не содержит полей для обновления", id);
             throw new InvalidOrderUpdateException("Не указаны поля для обновления (status или comment)");
         }
 

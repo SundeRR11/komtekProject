@@ -15,9 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderUpdateDto {
 
-    @Positive(message = "ID заявки должен быть положительным числом")
-    private Long id;
-
     private OrderStatus status;
 
     @Size(max = 500, message = "Комментарий не может превышать 500 символов")

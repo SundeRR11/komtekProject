@@ -16,7 +16,7 @@ public interface OrderService {
 
     Page<OrderResponseDto> search(OrderSearchDto searchDto);
 
-    OrderResponseDto updateOrder(OrderUpdateDto updateDto);
+    OrderResponseDto updateOrder(Long id, OrderUpdateDto updateDto);
 
     void deleteOrder(Long id);
 }
