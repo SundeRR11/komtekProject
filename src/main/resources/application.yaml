@@ -40,3 +40,17 @@ logging:
       max-size: 10MB
       max-history: 30
 
+sftp:
+  host: ${SFTP_HOST}
+  port: ${SFTP_PORT:22}
+  username: ${SFTP_USERNAME}
+  password: ${SFTP_PASSWORD}
+  remote-dir: ${SFTP_REMOTE_DIR:/upload}
+  connect-timeout-ms: 10000
+
+notification:
+  retry:
+    batch-size: 100
+    min-interval-minutes: 5
+    max-attempts: 10
+    scheduler-delay-ms: 10000

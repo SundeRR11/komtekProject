@@ -13,7 +13,8 @@ public enum ErrorCode {
     INVALID_JSON("INVALID_JSON", "Неверный формат JSON"),
     DUPLICATE_KEY("DUPLICATE_KEY", "Запись с такими данными уже существует"),
     INTERNAL_ERROR("INTERNAL_ERROR", "Внутренняя ошибка сервера"),
-    INVALID_UPDATE("INVALID_UPDATE", "Неверный запрос на обновление");
+    INVALID_UPDATE("INVALID_UPDATE", "Неверный запрос на обновление"),
+    MED_ORG_NOT_FOUND("MED_ORG_NOT_FOUND", "Медицинская организация не найдена");
 
     private final String code;
     private final String defaultMessage;

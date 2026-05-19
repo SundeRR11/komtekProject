@@ -1,0 +1,161 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: Alexsandr
+      changes:
+        - createTable:
+            schemaName: medical
+            tableName: medical_organizations
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 6
+      author: Alexsandr
+      changes:
+        - insert:
+            schemaName: medical
+            tableName: medical_organizations
+            columns:
+              - column: { name: name, value: "Поликлиника №1" }
+              - column: { name: email, value: "polyclinic1@test.local" }
+        - insert:
+            schemaName: medical
+            tableName: medical_organizations
+            columns:
+              - column: { name: name, value: "Городская больница №5" }
+              - column: { name: email, value: "hospital5@test.local" }
+
+  - changeSet:
+      id: 7
+      author: Alexsandr
+      changes:
+        - addColumn:
+            schemaName: medical
+            tableName: orders
+            columns:
+              - column:
+                  name: creator_org_id
+                  type: BIGINT
+              - column:
+                  name: executor_org_id
+                  type: BIGINT
+
+        - sql:
+            dbms: postgresql
+            sql: |
+              UPDATE medical.orders 
+              SET creator_org_id = 1, executor_org_id = 1 
+              WHERE creator_org_id IS NULL OR executor_org_id IS NULL;
+
+        - addNotNullConstraint:
+            schemaName: medical
+            tableName: orders
+            columnName: creator_org_id
+            columnDataType: BIGINT
+        - addNotNullConstraint:
+            schemaName: medical
+            tableName: orders
+            columnName: executor_org_id
+            columnDataType: BIGINT
+
+        - addForeignKeyConstraint:
+            constraintName: fk_orders_creator_org
+            baseTableSchemaName: medical
+            baseTableName: orders
+            baseColumnNames: creator_org_id
+            referencedTableSchemaName: medical
+            referencedTableName: medical_organizations
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_orders_executor_org
+            baseTableSchemaName: medical
+            baseTableName: orders
+            baseColumnNames: executor_org_id
+            referencedTableSchemaName: medical
+            referencedTableName: medical_organizations
+            referencedColumnNames: id
+
+        - createIndex:
+            schemaName: medical
+            tableName: orders
+            indexName: idx_orders_creator_org
+            columns:
+              - column: { name: creator_org_id }
+        - createIndex:
+            schemaName: medical
+            tableName: orders
+            indexName: idx_orders_executor_org
+            columns:
+              - column: { name: executor_org_id }
+
+  - changeSet:
+      id: 8
+      author: Alexsandr
+      changes:
+        - createTable:
+            schemaName: medical
+            tableName: notification_outbox
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: recipient_address
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message_text
+                  type: VARCHAR(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: error_message
+                  type: VARCHAR(2000)
+              - column:
+                  name: last_attempt_time
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: attempt_count
+                  type: INT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: BIGINT
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            schemaName: medical
+            tableName: notification_outbox
+            indexName: idx_outbox_last_attempt
+            columns:
+              - column: { name: last_attempt_time }

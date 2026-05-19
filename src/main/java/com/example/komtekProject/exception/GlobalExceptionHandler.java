@@ -40,6 +40,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(MedicalOrganizationNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleMedOrgNotFound(MedicalOrganizationNotFoundException ex) {
+        log.warn("Медицинская организация не найдена: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ex.getCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponseDto> handleBusinessException(BusinessException ex) {
         log.error("Бизнес-ошибка: {} - {}", ex.getCode(), ex.getMessage());

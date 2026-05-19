@@ -1,0 +1,10 @@
+services:
+  sftp:
+    image: atmoz/sftp:latest
+    container_name: komtek-sftp
+    ports:
+      - "2222:22"
+    volumes:
+      - ./upload:/home/sftpuser/upload
+    command: sftpuser:sftppassword:1001:100
+    restart: unless-stopped

@@ -23,6 +23,14 @@ public class Order {
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_org_id", nullable = false)
+    private MedicalOrganization creatorOrganization;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "executor_org_id", nullable = false)
+    private MedicalOrganization executorOrganization;
+
     @Column(name = "created_date",nullable = false)
     private LocalDateTime createdDate;
 
@@ -33,8 +41,14 @@ public class Order {
     @Column(length = 500)
     private String comment;
 
-    public Order(Patient patient, OrderStatus status, String comment) {
+    public Order(Patient patient,
+                 MedicalOrganization creatorOrganization,
+                 MedicalOrganization executorOrganization,
+                 OrderStatus status,
+                 String comment) {
         this.patient = patient;
+        this.creatorOrganization = creatorOrganization;
+        this.executorOrganization = executorOrganization;
         this.status = status;
         this.comment = comment;
         this.createdDate = LocalDateTime.now();

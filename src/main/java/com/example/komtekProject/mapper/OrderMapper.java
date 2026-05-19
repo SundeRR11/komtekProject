@@ -16,6 +16,10 @@ public interface OrderMapper {
     @Mapping(source = "patient", target = "patientFullName", qualifiedByName = "fullName")
     @Mapping(source = "patient.snils", target = "patientSnils")
     @Mapping(source = "patient.insurancePolicy.policyNumber", target = "patientEnp")
+    @Mapping(source = "creatorOrganization.id", target = "creatorOrgId")
+    @Mapping(source = "creatorOrganization.name", target = "creatorOrgName")
+    @Mapping(source = "executorOrganization.id", target = "executorOrgId")
+    @Mapping(source = "executorOrganization.name", target = "executorOrgName")
     OrderResponseDto toDto(Order order);
 
     List<OrderResponseDto> toDtoList(List<Order> orders);

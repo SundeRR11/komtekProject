@@ -4,18 +4,24 @@ import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
 import com.example.komtekProject.dto.OrderSearchDto;
 import com.example.komtekProject.dto.OrderUpdateDto;
+import com.example.komtekProject.entity.MedicalOrganization;
 import com.example.komtekProject.entity.Order;
 import com.example.komtekProject.entity.Patient;
 import com.example.komtekProject.enums.OrderStatus;
+import com.example.komtekProject.event.OrderCreatedEvent;
+import com.example.komtekProject.event.OrderStatusChangedEvent;
 import com.example.komtekProject.exception.InvalidOrderUpdateException;
+import com.example.komtekProject.exception.MedicalOrganizationNotFoundException;
 import com.example.komtekProject.exception.OrderNotFoundException;
 import com.example.komtekProject.exception.PatientNotFoundException;
 import com.example.komtekProject.mapper.OrderMapper;
+import com.example.komtekProject.repository.MedicalOrganizationRepository;
 import com.example.komtekProject.repository.OrderRepository;
 import com.example.komtekProject.repository.PatientRepository;
 import com.example.komtekProject.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,15 +30,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.EnumSet;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
+    private static final Set<OrderStatus> NOTIFIABLE_STATUSES = EnumSet.of(
+            OrderStatus.IN_PROGRESS,
+            OrderStatus.COMPLETED,
+            OrderStatus.CANCELED
+    );
+
     private final OrderRepository orderRepository;
     private final PatientRepository patientRepository;
+    private final MedicalOrganizationRepository medOrgRepository;
     private final OrderMapper orderMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -45,10 +61,27 @@ public class OrderServiceImpl implements OrderService {
                     return new PatientNotFoundException(request.getPatientId());
                 });
 
-        Order order = new Order(patient, OrderStatus.REGISTERED, request.getComment());
-        Order savedOrder = orderRepository.save(order);
+        MedicalOrganization creatorOrg = medOrgRepository.findById(request.getCreatorOrgId())
+                .orElseThrow(() -> {
+                    log.warn("МО-создатель с ID {} не найдена", request.getCreatorOrgId());
+                    return new MedicalOrganizationNotFoundException(request.getCreatorOrgId());
+                });
 
-        log.debug("Заявка создана. ID: {}, пациент ID: {}, статус: {}", savedOrder.getId(), patient.getId(), savedOrder.getStatus());
+        MedicalOrganization executorOrg = medOrgRepository.findById(request.getExecutorOrgId())
+                .orElseThrow(() -> {
+                    log.warn("МО-исполнитель с ID {} не найдена", request.getExecutorOrgId());
+                    return new MedicalOrganizationNotFoundException(request.getExecutorOrgId());
+                });
+
+        Order order = new Order(patient, creatorOrg, executorOrg,
+                OrderStatus.REGISTERED, request.getComment());
+        Order savedOrder = orderRepository.save(order);
+        log.debug("Заявка создана. ID: {}, статус: {}", savedOrder.getId(), savedOrder.getStatus());
+
+        eventPublisher.publishEvent(new OrderCreatedEvent(
+                savedOrder.getId(),
+                executorOrg.getEmail()
+        ));
 
         return orderMapper.toDto(savedOrder);
     }
@@ -91,7 +124,8 @@ public class OrderServiceImpl implements OrderService {
         );
 
         Page<Order> orderPage = orderRepository.search(id, status, snils, enp, fullName, birthDate, pageable);
-        log.debug("Найдено заявок: всего={}, страниц={}", orderPage.getTotalElements(), orderPage.getTotalPages());
+        log.debug("Найдено заявок: всего={}, страниц={}",
+                orderPage.getTotalElements(), orderPage.getTotalPages());
         return orderPage.map(orderMapper::toDto);
     }
 
@@ -109,11 +143,13 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus oldStatus = order.getStatus();
         String oldComment = order.getComment();
         boolean hasChanges = false;
+        boolean statusChanged = false;
 
-        if (updateDto.getStatus() != null) {
+        if (updateDto.getStatus() != null && updateDto.getStatus() != oldStatus) {
             log.info("  Обновление статуса: {} -> {}", oldStatus, updateDto.getStatus());
             order.setStatus(updateDto.getStatus());
             hasChanges = true;
+            statusChanged = true;
         }
 
         if (updateDto.getComment() != null) {
@@ -129,6 +165,14 @@ public class OrderServiceImpl implements OrderService {
 
         Order updatedOrder = orderRepository.save(order);
         log.info("Заявка ID: {} успешно обновлена", updatedOrder.getId());
+
+        if (statusChanged && NOTIFIABLE_STATUSES.contains(updatedOrder.getStatus())) {
+            eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                    updatedOrder.getId(),
+                    updatedOrder.getStatus(),
+                    updatedOrder.getCreatorOrganization().getEmail()
+            ));
+        }
 
         return orderMapper.toDto(updatedOrder);
     }
@@ -151,10 +195,3 @@ public class OrderServiceImpl implements OrderService {
         log.info("Заявка ID: {} удалена. Статус: {}, Пациент ID: {}", orderId, status, patientId);
     }
 }
-
-
-
-
-
-
-

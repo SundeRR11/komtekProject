@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/v1/2026_05_03_1710_SNILS_AND_POLICY_add-snils-and-policy.yaml
   - include:
       file: db/changelog/v1/2026_05_03_1715_ORDERS_create-orders-table.yaml
+  - include:
+      file: db/changelog/v1/2026_05_03_1720_MED_ORG_AND_NOTIFICATIONS.yaml

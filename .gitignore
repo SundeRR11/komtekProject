@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Env
+.env
+.env.local
+
+# SFTP local files
+docker/sftp/upload/
+!docker/sftp/upload/.gitkeep
+
+
