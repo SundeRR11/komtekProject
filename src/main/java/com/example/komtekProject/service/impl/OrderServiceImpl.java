@@ -4,13 +4,17 @@ import com.example.komtekProject.dto.OrderRequestDto;
 import com.example.komtekProject.dto.OrderResponseDto;
 import com.example.komtekProject.dto.OrderSearchDto;
 import com.example.komtekProject.dto.OrderUpdateDto;
+import com.example.komtekProject.dto.ResearchNameDto;
+import com.example.komtekProject.dto.StatusUpdateDto;
 import com.example.komtekProject.entity.MedicalOrganization;
 import com.example.komtekProject.entity.Order;
 import com.example.komtekProject.entity.Patient;
+import com.example.komtekProject.entity.Research;
 import com.example.komtekProject.enums.OrderStatus;
 import com.example.komtekProject.event.OrderCreatedEvent;
 import com.example.komtekProject.event.OrderStatusChangedEvent;
 import com.example.komtekProject.exception.InvalidOrderUpdateException;
+import com.example.komtekProject.exception.InvalidStatusTransitionException;
 import com.example.komtekProject.exception.MedicalOrganizationNotFoundException;
 import com.example.komtekProject.exception.OrderNotFoundException;
 import com.example.komtekProject.exception.PatientNotFoundException;
@@ -31,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -42,6 +47,10 @@ public class OrderServiceImpl implements OrderService {
             OrderStatus.IN_PROGRESS,
             OrderStatus.COMPLETED,
             OrderStatus.CANCELED
+    );
+
+    private static final Map<OrderStatus, Set<OrderStatus>> ALLOWED_TRANSITIONS = Map.of(
+            OrderStatus.REGISTERED, EnumSet.of(OrderStatus.IN_PROGRESS, OrderStatus.CANCELED)
     );
 
     private final OrderRepository orderRepository;
@@ -75,8 +84,16 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order(patient, creatorOrg, executorOrg,
                 OrderStatus.REGISTERED, request.getComment());
+
+        for (ResearchNameDto researchDto : request.getResearches()) {
+            Research research = new Research(researchDto.getName());
+            order.addResearch(research);
+        }
+
         Order savedOrder = orderRepository.save(order);
-        log.debug("Заявка создана. ID: {}, статус: {}", savedOrder.getId(), savedOrder.getStatus());
+
+        log.debug("Заявка создана. ID: {}, статус: {}, исследований: {}",
+                savedOrder.getId(), savedOrder.getStatus(), savedOrder.getResearches().size());
 
         eventPublisher.publishEvent(new OrderCreatedEvent(
                 savedOrder.getId(),
@@ -140,41 +157,63 @@ public class OrderServiceImpl implements OrderService {
                     return new OrderNotFoundException(id);
                 });
 
-        OrderStatus oldStatus = order.getStatus();
-        String oldComment = order.getComment();
-        boolean hasChanges = false;
-        boolean statusChanged = false;
-
-        if (updateDto.getStatus() != null && updateDto.getStatus() != oldStatus) {
-            log.info("  Обновление статуса: {} -> {}", oldStatus, updateDto.getStatus());
-            order.setStatus(updateDto.getStatus());
-            hasChanges = true;
-            statusChanged = true;
+        if (updateDto.getComment() == null) {
+            throw new InvalidOrderUpdateException("Не указано поле для обновления (comment)");
         }
 
-        if (updateDto.getComment() != null) {
-            log.info("  Обновление комментария: '{}' -> '{}'", oldComment, updateDto.getComment());
-            order.setComment(updateDto.getComment());
-            hasChanges = true;
+        log.info("  Обновление комментария: '{}' -> '{}'", order.getComment(), updateDto.getComment());
+        order.setComment(updateDto.getComment());
+
+        Order updated = orderRepository.save(order);
+        log.info("Заявка ID: {} успешно обновлена", updated.getId());
+
+        return orderMapper.toDto(updated);
+    }
+
+    @Override
+    @Transactional
+    public OrderResponseDto updateOrderStatus(Long id, StatusUpdateDto statusDto) {
+        log.info("PATCH смена статуса заявки ID: {} -> {}", id, statusDto.getStatus());
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Заявка с ID {} не найдена", id);
+                    return new OrderNotFoundException(id);
+                });
+
+        OrderStatus from = order.getStatus();
+        OrderStatus to = statusDto.getStatus();
+
+        if (from == to) {
+            log.warn("Попытка перевести Order ID: {} в тот же статус: {}", id, from);
+            throw new InvalidStatusTransitionException(from, to);
         }
 
-        if (!hasChanges) {
-            log.warn("PATCH запрос для заявки ID: {} не содержит полей для обновления", id);
-            throw new InvalidOrderUpdateException("Не указаны поля для обновления (status или comment)");
+        Set<OrderStatus> allowed = ALLOWED_TRANSITIONS.getOrDefault(from, Set.of());
+        if (!allowed.contains(to)) {
+            log.warn("Невозможный переход для Order ID: {}: {} -> {}", id, from, to);
+            throw new InvalidStatusTransitionException(from, to);
         }
 
-        Order updatedOrder = orderRepository.save(order);
-        log.info("Заявка ID: {} успешно обновлена", updatedOrder.getId());
+        if (to == OrderStatus.COMPLETED) {
+            log.warn("Попытка ручного перевода Order ID: {} в COMPLETED", id);
+            throw new InvalidStatusTransitionException(from, to);
+        }
 
-        if (statusChanged && NOTIFIABLE_STATUSES.contains(updatedOrder.getStatus())) {
+        order.setStatus(to);
+        Order updated = orderRepository.save(order);
+        log.info("Статус Order ID: {} изменён: {} -> {}", id, from, to);
+
+        // Оповещение МО-создателя при IN_PROGRESS / CANCELED
+        if (NOTIFIABLE_STATUSES.contains(to)) {
             eventPublisher.publishEvent(new OrderStatusChangedEvent(
-                    updatedOrder.getId(),
-                    updatedOrder.getStatus(),
-                    updatedOrder.getCreatorOrganization().getEmail()
+                    updated.getId(),
+                    updated.getStatus(),
+                    updated.getCreatorOrganization().getEmail()
             ));
         }
 
-        return orderMapper.toDto(updatedOrder);
+        return orderMapper.toDto(updated);
     }
 
     @Override

@@ -48,6 +48,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidStatusTransition(InvalidStatusTransitionException ex) {
+        log.warn("Невозможный переход статуса: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ex.getCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ResearchNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleResearchNotFound(ResearchNotFoundException ex) {
+        log.warn("Исследование не найдено: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ex.getCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidResearchResultException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidResearchResult(InvalidResearchResultException ex) {
+        log.warn("Некорректный результат исследования: {}", ex.getMessage());
+        ErrorResponseDto errorResponse = new ErrorResponseDto();
+        errorResponse.addError(ex.getCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponseDto> handleBusinessException(BusinessException ex) {
         log.error("Бизнес-ошибка: {} - {}", ex.getCode(), ex.getMessage());

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,4 +26,5 @@ public class OrderResponseDto {
     private LocalDateTime createdDate;
     private OrderStatus status;
     private String comment;
+    private List<ResearchResponseDto> researches;
 }

@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 9
+      author: Alexsandr
+      changes:
+        - createTable:
+            schemaName: medical
+            tableName: research
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: order_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: number_result
+                  type: NUMERIC(15, 4)
+              - column:
+                  name: unit
+                  type: VARCHAR(50)
+              - column:
+                  name: text_result
+                  type: VARCHAR(2000)
+              - column:
+                  name: conclusion
+                  type: VARCHAR(2000)
+              - column:
+                  name: registration_date
+                  type: TIMESTAMP
+
+        - addForeignKeyConstraint:
+            constraintName: fk_research_order
+            baseTableSchemaName: medical
+            baseTableName: research
+            baseColumnNames: order_id
+            referencedTableSchemaName: medical
+            referencedTableName: orders
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            schemaName: medical
+            tableName: research
+            indexName: idx_research_order_id
+            columns:
+              - column: { name: order_id }

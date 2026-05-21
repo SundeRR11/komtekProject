@@ -9,7 +9,7 @@ import org.mapstruct.Named;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ResearchMapper.class)
 public interface OrderMapper {
 
     @Mapping(source = "patient.id", target = "patientId")
@@ -20,6 +20,7 @@ public interface OrderMapper {
     @Mapping(source = "creatorOrganization.name", target = "creatorOrgName")
     @Mapping(source = "executorOrganization.id", target = "executorOrgId")
     @Mapping(source = "executorOrganization.name", target = "executorOrgName")
+    @Mapping(source = "researches", target = "researches")
     OrderResponseDto toDto(Order order);
 
     List<OrderResponseDto> toDtoList(List<Order> orders);

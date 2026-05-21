@@ -1,5 +1,7 @@
 package com.example.komtekProject.dto;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -7,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,4 +32,8 @@ public class OrderRequestDto {
 
     @Size(max = 500, message = "Комментарий не может превышать 500 символов")
     private String comment;
+
+    @NotEmpty(message = "Список исследований не может быть пустым")
+    @Valid
+    private List<ResearchNameDto> researches;
 }

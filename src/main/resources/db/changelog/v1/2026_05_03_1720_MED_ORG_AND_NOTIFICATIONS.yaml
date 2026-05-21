@@ -15,6 +15,12 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
+                  name: code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
                   name: name
                   type: VARCHAR(255)
                   constraints:
@@ -33,14 +39,51 @@ databaseChangeLog:
             schemaName: medical
             tableName: medical_organizations
             columns:
+              - column: { name: code, value: "MO_001" }
               - column: { name: name, value: "Поликлиника №1" }
               - column: { name: email, value: "polyclinic1@test.local" }
         - insert:
             schemaName: medical
             tableName: medical_organizations
             columns:
+              - column: { name: code, value: "MO_002" }
               - column: { name: name, value: "Городская больница №5" }
               - column: { name: email, value: "hospital5@test.local" }
+        - insert:
+            schemaName: medical
+            tableName: medical_organizations
+            columns:
+              - column: { name: code, value: "MO_003" }
+              - column: { name: name, value: "Стоматологическая поликлиника №3" }
+              - column: { name: email, value: "dental3@test.local" }
+        - insert:
+            schemaName: medical
+            tableName: medical_organizations
+            columns:
+              - column: { name: code, value: "MO_004" }
+              - column: { name: name, value: "Областной диагностический центр" }
+              - column: { name: email, value: "diagcenter@test.local" }
+        - insert:
+            schemaName: medical
+            tableName: medical_organizations
+            columns:
+              - column: { name: code, value: "MO_005" }
+              - column: { name: name, value: "Детская поликлиника №7" }
+              - column: { name: email, value: "childclinic7@test.local" }
+        - insert:
+            schemaName: medical
+            tableName: medical_organizations
+            columns:
+              - column: { name: code, value: "MO_006" }
+              - column: { name: name, value: "Центр лабораторной диагностики" }
+              - column: { name: email, value: "lab@test.local" }
+        - insert:
+            schemaName: medical
+            tableName: medical_organizations
+            columns:
+              - column: { name: code, value: "MO_007" }
+              - column: { name: name, value: "Кожно-венерологический диспансер" }
+              - column: { name: email, value: "dermatology@test.local" }
 
   - changeSet:
       id: 6

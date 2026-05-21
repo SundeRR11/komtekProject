@@ -1,7 +1,5 @@
 package com.example.komtekProject.dto;
 
-import com.example.komtekProject.enums.OrderStatus;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -15,7 +13,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderUpdateDto {
 
-    private OrderStatus status;
+    @Positive(message = "ID заявки должен быть положительным числом")
+    private Long id;
 
     @Size(max = 500, message = "Комментарий не может превышать 500 символов")
     private String comment;

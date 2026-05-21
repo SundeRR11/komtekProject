@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/v1/2026_05_03_1720_MED_ORG_AND_NOTIFICATIONS.yaml
   - include:
       file: db/changelog/v1/2026_05_19_1700_ATTACHMENTS.yaml
+  - include:
+      file: db/changelog/v1/2026_05_21_1700_RESEARCH.yaml

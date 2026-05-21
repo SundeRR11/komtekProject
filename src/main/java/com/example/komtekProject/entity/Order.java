@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,7 +33,7 @@ public class Order {
     @JoinColumn(name = "executor_org_id", nullable = false)
     private MedicalOrganization executorOrganization;
 
-    @Column(name = "created_date",nullable = false)
+    @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
     @Enumerated(EnumType.STRING)
@@ -40,6 +42,9 @@ public class Order {
 
     @Column(length = 500)
     private String comment;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Research> researches = new ArrayList<>();
 
     public Order(Patient patient,
                  MedicalOrganization creatorOrganization,
@@ -54,4 +59,8 @@ public class Order {
         this.createdDate = LocalDateTime.now();
     }
 
+    public void addResearch(Research research) {
+        researches.add(research);
+        research.setOrder(this);
+    }
 }

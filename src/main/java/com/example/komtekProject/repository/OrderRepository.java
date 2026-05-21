@@ -9,16 +9,29 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
+
+    @Override
+    @EntityGraph(attributePaths = {
+            "patient",
+            "patient.insurancePolicy",
+            "creatorOrganization",
+            "executorOrganization",
+            "researches"
+    })
+    Optional<Order> findById(Long id);
 
     @EntityGraph(attributePaths = {
             "patient",
             "patient.insurancePolicy",
             "creatorOrganization",
-            "executorOrganization"
+            "executorOrganization",
+            "researches"
     })
     @Query("SELECT o FROM Order o WHERE " +
             "(:id IS NULL OR o.id = :id) AND " +
@@ -29,11 +42,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "COALESCE(o.patient.middleName, ''))) LIKE LOWER(CONCAT('%', :fullName, '%'))) AND " +
             "(:birthDate IS NULL OR o.patient.birthDate = :birthDate)")
     Page<Order> search(@Param("id") Long id,
-                                     @Param("status") OrderStatus status,
-                                     @Param("snils") String snils,
-                                     @Param("enp") String enp,
-                                     @Param("fullName") String fullName,
-                                     @Param("birthDate") LocalDate birthDate,
-                                     Pageable pageable);
-
+                       @Param("status") OrderStatus status,
+                       @Param("snils") String snils,
+                       @Param("enp") String enp,
+                       @Param("fullName") String fullName,
+                       @Param("birthDate") LocalDate birthDate,
+                       Pageable pageable);
 }
