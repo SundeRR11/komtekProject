@@ -1,5 +1,6 @@
 package com.example.komtekProject.entity;
 
+import com.example.komtekProject.enums.RecipientType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,10 @@ public class NotificationOutbox {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "recipient_type", nullable = false)
+    private RecipientType recipientType;
+
     @Column(name = "recipient_address", nullable = false)
     private String recipientAddress;
 
@@ -33,18 +38,19 @@ public class NotificationOutbox {
     @Column(name = "attempt_count", nullable = false)
     private Integer attemptCount = 0;
 
-    @Column(name = "order_id")
-    private Long orderId;
+    @Column(name = "related_entity_id")
+    private Long relatedEntityId;
 
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
-    public NotificationOutbox(String recipientAddress, String messageText,
-                              String errorMessage, Long orderId) {
+    public NotificationOutbox(RecipientType recipientType, String recipientAddress,
+                              String messageText, String errorMessage, Long relatedEntityId) {
+        this.recipientType = recipientType;
         this.recipientAddress = recipientAddress;
         this.messageText = messageText;
         this.errorMessage = errorMessage;
-        this.orderId = orderId;
+        this.relatedEntityId = relatedEntityId;
         this.lastAttemptTime = LocalDateTime.now();
         this.createdDate = LocalDateTime.now();
         this.attemptCount = 1;

@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/v1/2026_05_03_1715_ORDERS_create-orders-table.yaml
   - include:
       file: db/changelog/v1/2026_05_03_1720_MED_ORG_AND_NOTIFICATIONS.yaml
+  - include:
+      file: db/changelog/v1/2026_05_19_1700_ATTACHMENTS.yaml

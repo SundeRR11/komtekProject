@@ -1,11 +1,11 @@
 databaseChangeLog:
   - changeSet:
-      id: 3
+      id: 8
       author: Alexsandr
       changes:
         - createTable:
             schemaName: medical
-            tableName: orders
+            tableName: attachments
             columns:
               - column:
                   name: id
@@ -20,13 +20,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: creator_org_id
+                  name: mo_id
                   type: BIGINT
                   constraints:
                     nullable: false
               - column:
-                  name: executor_org_id
-                  type: BIGINT
+                  name: type
+                  type: VARCHAR(20)
                   constraints:
                     nullable: false
               - column:
@@ -34,41 +34,39 @@ databaseChangeLog:
                   type: TIMESTAMP
                   constraints:
                     nullable: false
-              - column:
-                  name: status
-                  type: VARCHAR(20)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: comment
-                  type: VARCHAR(500)
 
         - addForeignKeyConstraint:
-            constraintName: fk_orders_patient
+            constraintName: fk_attachments_patient
             baseTableSchemaName: medical
-            baseTableName: orders
+            baseTableName: attachments
             baseColumnNames: patient_id
             referencedTableSchemaName: medical
             referencedTableName: patients
             referencedColumnNames: id
 
+        - addForeignKeyConstraint:
+            constraintName: fk_attachments_mo
+            baseTableSchemaName: medical
+            baseTableName: attachments
+            baseColumnNames: mo_id
+            referencedTableSchemaName: medical
+            referencedTableName: medical_organizations
+            referencedColumnNames: id
+
+        - sql:
+            dbms: postgresql
+            sql: ALTER TABLE medical.attachments ADD CONSTRAINT ck_attachment_type CHECK (type IN ('AMBULATORY', 'DENTAL'))
+
         - createIndex:
             schemaName: medical
-            tableName: orders
-            indexName: idx_orders_patient_id
+            tableName: attachments
+            indexName: idx_attachments_patient_id
             columns:
               - column: { name: patient_id }
 
         - createIndex:
             schemaName: medical
-            tableName: orders
-            indexName: idx_orders_status
+            tableName: attachments
+            indexName: idx_attachments_mo_id
             columns:
-              - column: { name: status }
-
-        - createIndex:
-            schemaName: medical
-            tableName: orders
-            indexName: idx_orders_created_date
-            columns:
-              - column: { name: created_date }
+              - column: { name: mo_id }

@@ -45,8 +45,8 @@ public class NotificationRetryScheduler {
 
     private void processOne(NotificationOutbox notification) {
         if (notification.getAttemptCount() >= retryProperties.getMaxAttempts()) {
-            log.error("Превышен лимит попыток ({}) для оповещения ID: {}. Удаляем из очереди.",
-                    retryProperties.getMaxAttempts(), notification.getId());
+            log.error("Превышен лимит попыток ({}) для оповещения ID: {} ({}). Удаляем из очереди.",
+                    retryProperties.getMaxAttempts(), notification.getId(), notification.getRecipientType());
             outboxRepository.delete(notification);
             return;
         }
@@ -55,11 +55,11 @@ public class NotificationRetryScheduler {
             sftpService.uploadToSftp(
                     notification.getRecipientAddress(),
                     notification.getMessageText(),
-                    notification.getOrderId()
+                    notification.getRelatedEntityId()
             );
             outboxRepository.delete(notification);
-            log.info("Оповещение ID: {} переотправлено и удалено из очереди",
-                    notification.getId());
+            log.info("Оповещение ID: {} ({}) переотправлено и удалено из очереди",
+                    notification.getId(), notification.getRecipientType());
 
         } catch (Exception e) {
             log.warn("Повторная ошибка отправки оповещения ID: {} (попытка {}/{}): {}",

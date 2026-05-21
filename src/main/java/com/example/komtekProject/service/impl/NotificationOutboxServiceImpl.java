@@ -1,6 +1,7 @@
 package com.example.komtekProject.service.impl;
 
 import com.example.komtekProject.entity.NotificationOutbox;
+import com.example.komtekProject.enums.RecipientType;
 import com.example.komtekProject.repository.NotificationOutboxRepository;
 import com.example.komtekProject.service.NotificationOutboxService;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +19,16 @@ public class NotificationOutboxServiceImpl implements NotificationOutboxService 
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveFailedNotification(String recipientAddress, String messageText,
-                                       String errorMessage, Long orderId) {
+    public void saveFailedNotification(RecipientType recipientType,
+                                       String recipientAddress,
+                                       String messageText,
+                                       String errorMessage,
+                                       Long relatedEntityId) {
         NotificationOutbox outbox = new NotificationOutbox(
-                recipientAddress, messageText, errorMessage, orderId
+                recipientType, recipientAddress, messageText, errorMessage, relatedEntityId
         );
         NotificationOutbox saved = outboxRepository.save(outbox);
-        log.info("Неудачное оповещение сохранено в outbox. ID: {}, Order ID: {}",
-                saved.getId(), orderId);
+        log.info("Неудачное оповещение сохранено в outbox. ID: {}, Type: {}, Related ID: {}",
+                saved.getId(), recipientType, relatedEntityId);
     }
 }

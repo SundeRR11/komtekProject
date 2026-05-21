@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 5
+      id: 4
       author: Alexsandr
       changes:
         - createTable:
@@ -26,7 +26,7 @@ databaseChangeLog:
                     nullable: false
 
   - changeSet:
-      id: 6
+      id: 5
       author: Alexsandr
       changes:
         - insert:
@@ -43,38 +43,9 @@ databaseChangeLog:
               - column: { name: email, value: "hospital5@test.local" }
 
   - changeSet:
-      id: 7
+      id: 6
       author: Alexsandr
       changes:
-        - addColumn:
-            schemaName: medical
-            tableName: orders
-            columns:
-              - column:
-                  name: creator_org_id
-                  type: BIGINT
-              - column:
-                  name: executor_org_id
-                  type: BIGINT
-
-        - sql:
-            dbms: postgresql
-            sql: |
-              UPDATE medical.orders 
-              SET creator_org_id = 1, executor_org_id = 1 
-              WHERE creator_org_id IS NULL OR executor_org_id IS NULL;
-
-        - addNotNullConstraint:
-            schemaName: medical
-            tableName: orders
-            columnName: creator_org_id
-            columnDataType: BIGINT
-        - addNotNullConstraint:
-            schemaName: medical
-            tableName: orders
-            columnName: executor_org_id
-            columnDataType: BIGINT
-
         - addForeignKeyConstraint:
             constraintName: fk_orders_creator_org
             baseTableSchemaName: medical
@@ -83,6 +54,7 @@ databaseChangeLog:
             referencedTableSchemaName: medical
             referencedTableName: medical_organizations
             referencedColumnNames: id
+
         - addForeignKeyConstraint:
             constraintName: fk_orders_executor_org
             baseTableSchemaName: medical
@@ -98,6 +70,7 @@ databaseChangeLog:
             indexName: idx_orders_creator_org
             columns:
               - column: { name: creator_org_id }
+
         - createIndex:
             schemaName: medical
             tableName: orders
@@ -106,7 +79,7 @@ databaseChangeLog:
               - column: { name: executor_org_id }
 
   - changeSet:
-      id: 8
+      id: 7
       author: Alexsandr
       changes:
         - createTable:
@@ -119,6 +92,11 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
+                    nullable: false
+              - column:
+                  name: recipient_type
+                  type: VARCHAR(20)
+                  constraints:
                     nullable: false
               - column:
                   name: recipient_address
@@ -145,13 +123,17 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: order_id
+                  name: related_entity_id
                   type: BIGINT
               - column:
                   name: created_date
                   type: TIMESTAMP
                   constraints:
                     nullable: false
+
+        - sql:
+            dbms: postgresql
+            sql: ALTER TABLE medical.notification_outbox ADD CONSTRAINT ck_outbox_recipient_type CHECK (recipient_type IN ('MO', 'PATIENT'))
 
         - createIndex:
             schemaName: medical

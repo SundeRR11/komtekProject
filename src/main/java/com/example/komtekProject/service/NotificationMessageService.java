@@ -1,10 +1,18 @@
 package com.example.komtekProject.service;
 
+import com.example.komtekProject.enums.AttachmentType;
 import com.example.komtekProject.enums.OrderStatus;
+
+import java.time.LocalDate;
 
 public interface NotificationMessageService {
 
-    String buildCreationMessage(Long orderId);
+    String buildOrderCreationMessage(Long orderId);
 
-    String buildStatusChangeMessage(Long orderId, OrderStatus newStatus);
+    String buildOrderStatusChangeMessage(Long orderId, OrderStatus newStatus);
+
+    String buildAttachmentMessage(String patientFullName,
+                                  AttachmentType type,
+                                  String moName,
+                                  LocalDate registrationDate);
 }

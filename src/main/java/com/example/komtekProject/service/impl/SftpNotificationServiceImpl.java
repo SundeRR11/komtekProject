@@ -22,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 public class SftpNotificationServiceImpl implements SftpNotificationService {
 
     private final SftpProperties sftpProperties;
-    private final NotificationOutboxService outboxService;  // ← Новый сервис вместо repository
 
     @PostConstruct
     public void logConfig() {
@@ -31,21 +30,6 @@ public class SftpNotificationServiceImpl implements SftpNotificationService {
                 sftpProperties.getPort(),
                 sftpProperties.getUsername(),
                 sftpProperties.getRemoteDir());
-    }
-
-    @Override
-    public void sendNotification(String recipientAddress, String messageText, Long orderId) {
-        log.info("Начало отправки оповещения. Recipient: {}, Order ID: {}", recipientAddress, orderId);
-        try {
-            uploadToSftp(recipientAddress, messageText, orderId);
-            log.info("Оповещение успешно отправлено на SFTP. Recipient: {}, Order ID: {}",
-                    recipientAddress, orderId);
-        } catch (Exception e) {
-            log.error("Ошибка отправки на SFTP. Recipient: {}, Order ID: {}. Сохраняем в outbox. Причина: {}",
-                    recipientAddress, orderId, e.getMessage());
-            // ✅ Вызов через другой бин — Spring AOP сработает
-            outboxService.saveFailedNotification(recipientAddress, messageText, e.getMessage(), orderId);
-        }
     }
 
     @Override
